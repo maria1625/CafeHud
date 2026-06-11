@@ -6,10 +6,20 @@ const getStoredUser = () => {
     const stored = localStorage.getItem('cafe_user');
     return stored ? JSON.parse(stored) : null;
   } catch (e) {
-    console.error('Error al parsear cafe_user:', e);
+    console.error('Error al leer cafe_user:', e);
     return null;
   }
 };
+
+const persistUser = (user) => {
+  if (user) {
+    localStorage.setItem('cafe_user', JSON.stringify(user));
+  } else {
+    localStorage.removeItem('cafe_user');
+  }
+};
+
+const extractUser = (response) => response?.user ?? response;
 
 export const useAuthStore = create((set, get) => ({
   user: getStoredUser(),
@@ -18,29 +28,42 @@ export const useAuthStore = create((set, get) => ({
   loading: false,
   error: null,
 
+  setUser: (user) => {
+    persistUser(user);
+    set({ user, isAuthenticated: !!user });
+  },
+
   initialize: async () => {
     set({ initializing: true, error: null });
     try {
       const response = await authApi.me();
-      const user = response.data?.data?.user || response.data?.user || response.user || response;
-      localStorage.setItem('cafe_user', JSON.stringify(user));
+      const user = extractUser(response);
+      persistUser(user);
       set({ user, isAuthenticated: true, initializing: false, loading: false });
     } catch (err) {
-      localStorage.removeItem('cafe_user');
+      persistUser(null);
       set({ user: null, isAuthenticated: false, initializing: false, loading: false });
     }
+  },
+
+  refreshMe: async () => {
+    const response = await authApi.me();
+    const user = extractUser(response);
+    persistUser(user);
+    set({ user, isAuthenticated: true });
+    return user;
   },
 
   login: async (credentials) => {
     set({ loading: true, error: null });
     try {
       const response = await authApi.login(credentials);
-      const user = response.data?.data?.user || response.data?.user || response.user || response;
-      localStorage.setItem('cafe_user', JSON.stringify(user));
+      const user = extractUser(response);
+      persistUser(user);
       set({ user, isAuthenticated: true, loading: false, error: null });
       return user;
     } catch (err) {
-      const message = err.response?.data?.message || 'Credenciales inválidas';
+      const message = err.response?.data?.message || 'Credenciales invalidas';
       set({ error: message, loading: false });
       throw new Error(message);
     }
@@ -50,8 +73,8 @@ export const useAuthStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const response = await authApi.register(userData);
-      const user = response.data?.data?.user || response.data?.user || response.user || response;
-      localStorage.setItem('cafe_user', JSON.stringify(user));
+      const user = extractUser(response);
+      persistUser(user);
       set({ user, isAuthenticated: true, loading: false, error: null });
       return user;
     } catch (err) {
@@ -66,14 +89,12 @@ export const useAuthStore = create((set, get) => ({
     try {
       await authApi.logout();
     } catch (err) {
-      console.warn('Error cerrando sesión:', err);
+      console.warn('Error cerrando sesion:', err);
     }
-    localStorage.removeItem('cafe_user');
+    persistUser(null);
     set({ user: null, isAuthenticated: false, loading: false, error: null });
   },
 
-  isAdmin: () => {
-    const currentUser = get().user;
-    return currentUser?.role === 'admin';
-  }
+  isAdmin: () => get().user?.role === 'admin',
+  isClient: () => ['user', 'admin'].includes(get().user?.role)
 }));

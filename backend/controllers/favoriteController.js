@@ -7,6 +7,7 @@ export const getFavorites = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
   }
+
   const favorites = user.favorites.map((cafe) => cafe._id.toString());
   res.status(200).json({ success: true, data: favorites });
 });
@@ -14,7 +15,7 @@ export const getFavorites = asyncHandler(async (req, res) => {
 export const toggleFavorite = asyncHandler(async (req, res) => {
   const cafe = await Cafe.findById(req.params.id);
   if (!cafe) {
-    return res.status(404).json({ success: false, message: 'Café no encontrado' });
+    return res.status(404).json({ success: false, message: 'Cafe no encontrado' });
   }
 
   const user = await User.findById(req.user.id);

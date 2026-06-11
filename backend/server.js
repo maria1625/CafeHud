@@ -10,6 +10,7 @@ import { config } from './config/environment.js';
 import authRoutes from './routes/auth.js';
 import cafeRoutes from './routes/cafes.js';
 import favoriteRoutes from './routes/favorites.js';
+import reviewRoutes from './routes/reviews.js';
 import adminRoutes from './routes/admin.js';
 import healthRoutes from './routes/health.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -29,6 +30,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/cafes', cafeRoutes);
 app.use('/api/v1/favorites', favoriteRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/', healthRoutes);
 

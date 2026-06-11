@@ -3,68 +3,47 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: `${API_URL}/api/v1`,
   withCredentials: true,
 });
 
+const unwrap = (response) => response.data?.data ?? response.data;
+
 export const authApi = {
-  login: async (credentials) => {
-    const response = await api.post("/v1/auth/login", credentials);
-    return response.data;
-  },
-
-  register: async (userData) => {
-    const response = await api.post("/v1/auth/register", userData);
-    return response.data;
-  },
-
-  me: async () => {
-    const response = await api.get("/v1/auth/me");
-    return response.data;
-  },
-
-  logout: async () => {
-    const response = await api.post("/v1/auth/logout");
-    return response.data;
-  }
+  login: async (credentials) => unwrap(await api.post("/auth/login", credentials)),
+  register: async (userData) => unwrap(await api.post("/auth/register", userData)),
+  me: async () => unwrap(await api.get("/auth/me")),
+  logout: async () => unwrap(await api.post("/auth/logout")),
 };
 
 export const cafeApi = {
-  getCafes: async () => {
-    const response = await api.get("/cafes");
-    return response.data;
-  },
-  vote: async (id) => {
-    const response = await api.post(`/cafes/${id}/vote`);
-    return response.data;
-  },
-  addReview: async (id, reviewData) => {
-    const response = await api.post(`/cafes/${id}/reviews`, reviewData);
-    return response.data;
-  },
+  getCafes: async () => unwrap(await api.get("/cafes")),
+  getCafe: async (id) => unwrap(await api.get(`/cafes/${id}`)),
+  vote: async (id) => unwrap(await api.post(`/cafes/${id}/vote`)),
+  addReview: async (id, reviewData) => unwrap(await api.post(`/cafes/${id}/reviews`, reviewData)),
 };
 
 export const favoriteApi = {
-  getFavorites: async () => {
-    const response = await api.get(`/favorites`);
-    return response.data;
-  },
-  toggle: async (cafeId) => {
-    const response = await api.post(`/favorites/${cafeId}/toggle`);
-    return response.data;
-  },
+  getFavorites: async () => unwrap(await api.get("/favorites")),
+  toggle: async (cafeId) => unwrap(await api.post(`/favorites/${cafeId}/toggle`)),
+};
+
+export const reviewApi = {
+  getMine: async () => unwrap(await api.get("/reviews/mine")),
+  update: async (reviewId, reviewData) => unwrap(await api.put(`/reviews/${reviewId}`, reviewData)),
+  delete: async (reviewId) => unwrap(await api.delete(`/reviews/${reviewId}`)),
 };
 
 export const adminApi = {
-  getUsers: async () => api.get('/v1/admin/users'),
-  updateUserRole: async (userId, role) => api.put(`/v1/admin/users/${userId}/role`, { role }),
-  deleteUser: async (userId) => api.delete(`/v1/admin/users/${userId}`),
-  getCafes: async () => api.get('/v1/admin/cafes'),
-  createCafe: async (cafeData) => api.post('/v1/admin/cafes', cafeData),
-  updateCafe: async (cafeId, cafeData) => api.put(`/v1/admin/cafes/${cafeId}`, cafeData),
-  deleteCafe: async (cafeId) => api.delete(`/v1/admin/cafes/${cafeId}`),
-  getReviews: async () => api.get('/v1/admin/reviews'),
-  deleteReview: async (reviewId) => api.delete(`/v1/admin/reviews/${reviewId}`),
+  getUsers: async () => unwrap(await api.get("/admin/users")),
+  updateUserRole: async (userId, role) => unwrap(await api.put(`/admin/users/${userId}/role`, { role })),
+  deleteUser: async (userId) => unwrap(await api.delete(`/admin/users/${userId}`)),
+  getCafes: async () => unwrap(await api.get("/admin/cafes")),
+  createCafe: async (cafeData) => unwrap(await api.post("/admin/cafes", cafeData)),
+  updateCafe: async (cafeId, cafeData) => unwrap(await api.put(`/admin/cafes/${cafeId}`, cafeData)),
+  deleteCafe: async (cafeId) => unwrap(await api.delete(`/admin/cafes/${cafeId}`)),
+  getReviews: async () => unwrap(await api.get("/admin/reviews")),
+  deleteReview: async (reviewId) => unwrap(await api.delete(`/admin/reviews/${reviewId}`)),
 };
 
 export default api;

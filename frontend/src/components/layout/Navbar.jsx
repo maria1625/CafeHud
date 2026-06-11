@@ -19,6 +19,14 @@ const Navbar = () => {
     navigate("/login"); 
   };
 
+  const handleCartOpen = () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+    setIsCartOpen(true);
+  };
+
   return (
     <nav className="nav-premium">
       {/* Logo */}
@@ -91,7 +99,7 @@ const Navbar = () => {
 
           {/* Cart Toggle */}
           <button 
-            onClick={() => setIsCartOpen(true)}
+            onClick={handleCartOpen}
             className="relative p-2.5 bg-brand-medium dark:bg-white/10 hover:bg-brand-dark dark:hover:bg-white/20 rounded-xl border border-white/10 transition-all active:scale-95 group shadow-lg"
             aria-label="Abrir carrito"
           >

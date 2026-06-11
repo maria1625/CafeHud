@@ -26,7 +26,8 @@ const sanitizeUser = (user) => ({
   name: user.name,
   email: user.email,
   role: user.role,
-  points: user.points
+  points: user.points,
+  favorites: user.favorites
 });
 
 export const register = asyncHandler(async (req, res) => {
@@ -34,7 +35,7 @@ export const register = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       success: false,
-      message: 'Error de validación',
+      message: 'Error de validacion',
       errors: errors.array()
     });
   }
@@ -75,7 +76,7 @@ export const login = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       success: false,
-      message: 'Error de validación',
+      message: 'Error de validacion',
       errors: errors.array()
     });
   }
@@ -86,7 +87,7 @@ export const login = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(401).json({
       success: false,
-      message: 'Credenciales inválidas'
+      message: 'Credenciales invalidas'
     });
   }
 
@@ -94,7 +95,7 @@ export const login = asyncHandler(async (req, res) => {
   if (!isPasswordValid) {
     return res.status(401).json({
       success: false,
-      message: 'Credenciales inválidas'
+      message: 'Credenciales invalidas'
     });
   }
 
@@ -103,7 +104,7 @@ export const login = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: 'Inicio de sesión exitoso',
+    message: 'Inicio de sesion exitoso',
     data: {
       user: sanitizeUser(user)
     }
@@ -111,7 +112,7 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const me = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id).select('-password');
   if (!user) {
     return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
   }
@@ -125,5 +126,5 @@ export const logout = asyncHandler(async (req, res) => {
     secure,
     sameSite: secure ? 'none' : 'lax'
   });
-  res.status(200).json({ success: true, message: 'Sesión cerrada correctamente' });
+  res.status(200).json({ success: true, message: 'Sesion cerrada correctamente' });
 });

@@ -20,79 +20,74 @@ const RegisterForm = () => {
 
   return (
     <div className="card-premium w-full max-w-[500px] p-10 sm:p-14 my-10">
-      {/* Header */}
       <div className="text-center mb-12">
         <h2 className="text-4xl font-black text-brand-dark mb-2 tracking-tighter">
-          Crear Cuenta
+          Crear cuenta
         </h2>
         <p className="text-brand-medium font-bold text-sm uppercase tracking-widest opacity-70">
-          Únete a la comunidad de CaféHub
+          Unete a la comunidad de CafeHub
         </p>
       </div>
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Name Input */}
         <div className="space-y-2">
           <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
             Nombre completo
           </label>
-          <input 
-            placeholder="Juan Pérez" 
-            {...register("name", { required: "El nombre es obligatorio" })} 
-            className={`input-premium ${errors.name ? 'border-red-300 ring-4 ring-red-50' : ''}`}
+          <input
+            placeholder="Juan Perez"
+            {...register("name", { required: "El nombre es obligatorio" })}
+            className={`input-premium ${errors.name ? "border-red-300 ring-4 ring-red-50" : ""}`}
           />
           {errors.name && <p className="text-[11px] text-red-500 font-black uppercase tracking-wider ml-1">{errors.name.message}</p>}
         </div>
 
-        {/* Email Input */}
         <div className="space-y-2">
           <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
-            Correo electrónico
+            Correo electronico
           </label>
-          <input 
-            placeholder="tu@email.com" 
-            {...register("email", { 
+          <input
+            placeholder="tu@email.com"
+            {...register("email", {
               required: "El correo es obligatorio",
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Correo electrónico inválido"
+                message: "Correo electronico invalido"
               }
-            })} 
-            className={`input-premium ${errors.email ? 'border-red-300 ring-4 ring-red-50' : ''}`}
+            })}
+            className={`input-premium ${errors.email ? "border-red-300 ring-4 ring-red-50" : ""}`}
           />
           {errors.email && <p className="text-[11px] text-red-500 font-black uppercase tracking-wider ml-1">{errors.email.message}</p>}
         </div>
 
-        {/* Password Input */}
         <div className="space-y-2">
           <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
-            Contraseña
+            Contrasena
           </label>
           <input
             type="password"
-            placeholder="••••••••"
-            {...register("password", { 
-              required: "La contraseña es obligatoria",
-              minLength: { value: 6, message: "Mínimo 6 caracteres" }
+            placeholder="********"
+            {...register("password", {
+              required: "La contrasena es obligatoria",
+              minLength: { value: 6, message: "Minimo 6 caracteres" }
             })}
-            className={`input-premium ${errors.password ? 'border-red-300 ring-4 ring-red-50' : ''}`}
+            className={`input-premium ${errors.password ? "border-red-300 ring-4 ring-red-50" : ""}`}
           />
           {errors.password && <p className="text-[11px] text-red-500 font-black uppercase tracking-wider ml-1">{errors.password.message}</p>}
         </div>
 
-        {/* Confirm Password Input */}
         <div className="space-y-2">
           <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
-            Confirmar contraseña
+            Confirmar contrasena
           </label>
           <input
             type="password"
-            placeholder="••••••••"
+            placeholder="********"
             {...register("confirmPassword", {
-              required: "Confirma tu contraseña",
-              validate: (value) => value === password || "Las contraseñas no coinciden",
+              required: "Confirma tu contrasena",
+              validate: (value) => value === password || "Las contrasenas no coinciden",
             })}
-            className={`input-premium ${errors.confirmPassword ? 'border-red-300 ring-4 ring-red-50' : ''}`}
+            className={`input-premium ${errors.confirmPassword ? "border-red-300 ring-4 ring-red-50" : ""}`}
           />
           {errors.confirmPassword && <p className="text-[11px] text-red-500 font-black uppercase tracking-wider ml-1">{errors.confirmPassword.message}</p>}
         </div>
@@ -107,11 +102,7 @@ const RegisterForm = () => {
         )}
 
         <div className="pt-6">
-          <button 
-            type="submit" 
-            disabled={loading}
-            className="btn-premium w-full shadow-2xl py-5 text-sm uppercase tracking-[0.2em]"
-          >
+          <button type="submit" disabled={loading} className="btn-premium w-full shadow-2xl py-5 text-sm uppercase tracking-[0.2em]">
             {loading ? (
               <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : "Crear cuenta"}
@@ -119,7 +110,7 @@ const RegisterForm = () => {
         </div>
 
         <p className="text-center text-brand-medium mt-10 font-bold text-xs uppercase tracking-widest">
-          ¿Ya tienes cuenta? <Link to="/login" className="text-brand-dark font-black hover:underline underline-offset-8 decoration-2">Inicia sesión</Link>
+          Ya tienes cuenta? <Link to="/login" className="text-brand-dark font-black hover:underline underline-offset-8 decoration-2">Inicia sesion</Link>
         </p>
       </form>
     </div>

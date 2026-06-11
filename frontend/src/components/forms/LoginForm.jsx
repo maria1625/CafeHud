@@ -5,8 +5,8 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate, Link } from "react-router-dom";
 
 const schema = z.object({
-  email: z.string().email("Correo inválido"),
-  password: z.string().min(6, "Mínimo 6 caracteres"),
+  email: z.string().email("Correo invalido"),
+  password: z.string().min(6, "Minimo 6 caracteres"),
 });
 
 const LoginForm = () => {
@@ -28,8 +28,6 @@ const LoginForm = () => {
 
   return (
     <div className="card-premium w-full max-w-[460px] p-10 sm:p-14">
-      
-      {/* Logo Circular */}
       <div className="flex flex-col items-center mb-12">
         <div className="w-24 h-24 bg-brand-dark text-white rounded-full flex items-center justify-center shadow-2xl mb-8 border-8 border-brand-bg">
           <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -41,43 +39,40 @@ const LoginForm = () => {
           </svg>
         </div>
         <h2 className="text-4xl font-black text-brand-dark mb-2 tracking-tighter">
-          Iniciar Sesión
+          Iniciar sesion
         </h2>
         <p className="text-brand-medium font-bold text-sm uppercase tracking-widest opacity-70">
-          Accede a tu cuenta de CaféHub
+          Accede a tu cuenta de CafeHub
         </p>
       </div>
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        
-        {/* Email Input */}
         <div className="space-y-3">
           <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
-            Correo electrónico
+            Correo electronico
           </label>
           <input
             type="email"
             placeholder="tu@email.com"
             {...register("email")}
-            className={`input-premium ${errors.email ? 'border-red-300 focus:ring-red-100' : ''}`}
+            className={`input-premium ${errors.email ? "border-red-300 focus:ring-red-100" : ""}`}
           />
           {errors.email && (
             <p className="mt-2 text-sm text-red-500 font-bold italic">
-              {errors.email.message}  
+              {errors.email.message}
             </p>
           )}
         </div>
 
-        {/* Password Input */}
         <div className="space-y-3">
           <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
-            Contraseña
+            Contrasena
           </label>
           <input
             type="password"
-            placeholder="••••••••"
+            placeholder="********"
             {...register("password")}
-            className={`input-premium ${errors.password ? 'border-red-300 ring-4 ring-red-50' : ''}`}
+            className={`input-premium ${errors.password ? "border-red-300 ring-4 ring-red-50" : ""}`}
           />
           {errors.password && (
             <p className="text-[11px] text-red-500 font-black uppercase tracking-wider ml-1">
@@ -86,7 +81,6 @@ const LoginForm = () => {
           )}
         </div>
 
-        {/* Server Error Alert */}
         {authError && (
           <div className="p-5 bg-red-50 text-red-700 rounded-2xl border-2 border-red-100 text-xs font-black uppercase tracking-widest flex items-center gap-4 animate-shake">
             <svg className="w-6 h-6 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -96,12 +90,7 @@ const LoginForm = () => {
           </div>
         )}
 
-        {/* Submit Button */}
-        <button 
-          type="submit" 
-          disabled={loading}
-          className="btn-premium w-full mt-4"
-        >
+        <button type="submit" disabled={loading} className="btn-premium w-full mt-4">
           {loading ? (
             <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
           ) : (
@@ -110,7 +99,7 @@ const LoginForm = () => {
         </button>
 
         <p className="text-center text-brand-medium mt-8 font-medium">
-          ¿No tienes cuenta? <Link to="/register" className="text-brand-dark font-black hover:underline underline-offset-4">Regístrate aquí</Link>
+          No tienes cuenta? <Link to="/register" className="text-brand-dark font-black hover:underline underline-offset-4">Registrate aqui</Link>
         </p>
       </form>
     </div>

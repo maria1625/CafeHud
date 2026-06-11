@@ -151,4 +151,16 @@ body {
   .badge-unavailable {
     @apply absolute top-6 left-6 bg-red-600 text-white text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-full z-10;
   }
+
+  .table-cell-admin {
+    @apply border-b border-brand-light px-4 py-4 text-sm font-bold text-brand-medium align-top;
+  }
+
+  .btn-table-primary {
+    @apply rounded-lg bg-brand-medium px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-brand-dark;
+  }
+
+  .btn-table-danger {
+    @apply rounded-lg bg-red-600 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-red-700;
+  }
 }
