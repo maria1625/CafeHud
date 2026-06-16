@@ -10,7 +10,13 @@
     "test": "cross-env NODE_ENV=test jest --runInBand",
     "test:watch": "cross-env NODE_ENV=test jest --watch"
   },
-  "keywords": ["cafehub", "backend", "express", "mongodb", "jwt"],
+  "keywords": [
+    "cafehub",
+    "backend",
+    "express",
+    "mongodb",
+    "jwt"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -18,10 +24,9 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "dotenv-safe": "^8.2.0",
     "express": "^5.2.1",
-    "joi": "^17.10.0",
     "express-validator": "^7.0.0",
+    "joi": "^17.10.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.6.1",
     "morgan": "^1.10.0",

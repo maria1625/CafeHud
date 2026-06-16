@@ -6,10 +6,7 @@ const __dirname = process.cwd();
 const envFileName = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
 
 dotenv.config({
-  allowEmptyValues: true,
-  silent: true,
   path: path.join(__dirname, envFileName),
-  example: path.join(__dirname, '.env.example')
 });
 
 process.env.MONGODB_URI = process.env.MONGODB_URI || process.env.URL;
