@@ -6,8 +6,7 @@ const RegisterForm = () => {
   const { register: registerUser, loading, error: authError } = useAuthStore();
   const navigate = useNavigate();
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
-  const password = watch("password");
+  const { register, handleSubmit, getValues, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
     try {
@@ -85,7 +84,7 @@ const RegisterForm = () => {
             placeholder="********"
             {...register("confirmPassword", {
               required: "Confirma tu contrasena",
-              validate: (value) => value === password || "Las contrasenas no coinciden",
+              validate: (value) => value === getValues("password") || "Las contrasenas no coinciden",
             })}
             className={`input-premium ${errors.confirmPassword ? "border-red-300 ring-4 ring-red-50" : ""}`}
           />

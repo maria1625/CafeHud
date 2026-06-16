@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 //#region src/api/api.js
-var API_URL = "http://localhost:3000";
+var API_URL = "http://localhost:4000";
 var isHandlingUnauthorized = false;
 var api = axios.create({
 	baseURL: `${API_URL}/api/v1`,
@@ -12,6 +12,7 @@ api.interceptors.response.use((response) => response, async (error) => {
 	if (error.response?.status === 401 && !isAuthEndpoint) {
 		if (isHandlingUnauthorized) return Promise.reject(error);
 		isHandlingUnauthorized = true;
+		let shouldRedirect = false;
 		try {
 			await api.post("/auth/logout");
 		} catch (logoutError) {
@@ -19,14 +20,12 @@ api.interceptors.response.use((response) => response, async (error) => {
 		} finally {
 			localStorage.clear();
 			sessionStorage.clear();
-			const { useAuthStore } = await import("./useAuthStore-C0sZxLTF.js");
+			const { useAuthStore } = await import("./useAuthStore-MOS9mxN2.js");
 			useAuthStore.getState().setUser(null);
-			if (typeof window !== "undefined" && !["/login", "/register"].includes(window.location.pathname)) {
-				window.location.replace("/login");
-				return Promise.reject(error);
-			}
+			shouldRedirect = typeof window !== "undefined" && !["/login", "/register"].includes(window.location.pathname);
 			isHandlingUnauthorized = false;
 		}
+		if (shouldRedirect) window.location.replace("/login");
 	}
 	return Promise.reject(error);
 });
@@ -110,7 +109,7 @@ var useAuthStore = create((set, get) => ({
 				initializing: false,
 				loading: false
 			});
-		} catch (err) {
+		} catch {
 			persistUser(null);
 			set({
 				user: null,
@@ -144,8 +143,8 @@ var useAuthStore = create((set, get) => ({
 				error: null
 			});
 			return user;
-		} catch (err) {
-			const message = err.response?.data?.message || "Credenciales invalidas";
+		} catch (error) {
+			const message = error.response?.data?.message || "Credenciales invalidas";
 			set({
 				error: message,
 				loading: false
@@ -168,8 +167,8 @@ var useAuthStore = create((set, get) => ({
 				error: null
 			});
 			return user;
-		} catch (err) {
-			const message = err.response?.data?.message || "Error al registrarse";
+		} catch (error) {
+			const message = error.response?.data?.message || "Error al registrarse";
 			set({
 				error: message,
 				loading: false
@@ -184,8 +183,8 @@ var useAuthStore = create((set, get) => ({
 		});
 		try {
 			await authApi.logout();
-		} catch (err) {
-			console.warn("Error cerrando sesion:", err);
+		} catch (error) {
+			console.warn("Error cerrando sesion:", error);
 		}
 		persistUser(null);
 		set({

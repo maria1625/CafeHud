@@ -1,5 +1,11 @@
 import mongoose from 'mongoose';
 
+const applyAvailabilityFromStock = (target) => {
+  if (target && target.stock !== undefined) {
+    target.available = Number(target.stock) > 0;
+  }
+};
+
 const cafeSchema = new mongoose.Schema({
   id: {
     type: Number,
@@ -44,6 +50,16 @@ const cafeSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+  stock: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  minimumStock: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
   available: {
     type: Boolean,
     default: true
@@ -58,6 +74,16 @@ const cafeSchema = new mongoose.Schema({
   }]
 }, {
   timestamps: true
+});
+
+cafeSchema.pre('save', function syncAvailability() {
+  applyAvailabilityFromStock(this);
+});
+
+cafeSchema.pre('findOneAndUpdate', function syncAvailability() {
+  const update = this.getUpdate() || {};
+  applyAvailabilityFromStock(update);
+  this.setUpdate(update);
 });
 
 export default mongoose.model('Cafe', cafeSchema);

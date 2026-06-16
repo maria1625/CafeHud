@@ -8,6 +8,7 @@ import FilterBar from "./filters/FilterBar";
 import ReviewModal from "./ui/ReviewModal";
 import LoadingSpinner from "./ui/LoadingSpinner";
 import ErrorState from "./ui/ErrorState";
+import { formatCOP } from '../utils/formatters';
 
 const getCafeId = (cafe) => String(cafe?._id || cafe?.id);
 
@@ -22,7 +23,18 @@ const CoffeeCard = ({ cafe }) => {
 
   const cafeId = getCafeId(cafe);
   const isFavorite = favorites.includes(cafeId);
-  const isUnavailable = !cafe.available;
+  const stock = Number(cafe.stock);
+  const hasStock = Number.isFinite(stock);
+  const isOutOfStock = hasStock && stock <= 0;
+  const isUnavailable = !cafe.available || isOutOfStock;
+  const badgeLabel = isOutOfStock
+    ? "Agotado"
+    : !cafe.available
+      ? "No disponible"
+      : hasStock
+        ? `Stock: ${stock}`
+        : null;
+  const cafeImageUrl = cafe.imageUrl || 'https://via.placeholder.com/800x800.png?text=Sin+imagen';
   const isClient = !!user && ["client", "user"].includes(user.role);
   const isBlockedByRole = !!user && !isClient;
 
@@ -74,7 +86,7 @@ const CoffeeCard = ({ cafe }) => {
 
       <div className="relative h-72 overflow-hidden">
         <img
-          src={cafe.imageUrl}
+          src={cafeImageUrl}
           alt={cafe.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         />
@@ -99,7 +111,11 @@ const CoffeeCard = ({ cafe }) => {
           </svg>
         </button>
 
-        {!cafe.available && <div className="badge-unavailable">No disponible</div>}
+        {badgeLabel && (
+          <div className="absolute top-6 left-6 z-20 rounded-full border border-white/20 bg-black/20 px-4 py-1 text-[10px] font-black uppercase tracking-widest text-white backdrop-blur-md">
+            {badgeLabel}
+          </div>
+        )}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-brand-dark/40 to-transparent" />
       </div>
 
@@ -109,7 +125,7 @@ const CoffeeCard = ({ cafe }) => {
             <h3 className="text-2xl font-black text-brand-dark dark:text-white leading-none mb-2">{cafe.name}</h3>
             <p className="text-xs font-black text-brand-medium dark:text-gray-400 uppercase tracking-[0.2em]">{cafe.brand}</p>
           </div>
-          <span className="text-2xl font-black text-brand-dark dark:text-white tracking-tighter">${Number(cafe.price).toFixed(2)}</span>
+          <span className="text-2xl font-black text-brand-dark dark:text-white tracking-tighter">{formatCOP(cafe.price)}</span>
         </div>
 
         <p className="text-brand-medium dark:text-gray-300 text-sm mb-8 line-clamp-2 italic font-medium leading-relaxed">
@@ -121,7 +137,7 @@ const CoffeeCard = ({ cafe }) => {
             onClick={() => setShowReviews(!showReviews)}
             className="text-[10px] font-black text-brand-medium dark:text-gray-400 uppercase tracking-widest hover:text-brand-dark dark:hover:text-white transition-colors"
           >
-            {showReviews ? "Ocultar resenas" : `Ver resenas (${cafe.reviews?.length || 0})`}
+            {showReviews ? "Ocultar reseñas" : `Ver reseñas (${cafe.reviews?.length || 0})`}
           </button>
           <button
             onClick={() => {
@@ -130,9 +146,9 @@ const CoffeeCard = ({ cafe }) => {
             }}
             disabled={isBlockedByRole}
             className="text-[10px] font-black text-brand-medium dark:text-white underline uppercase tracking-widest"
-            title={isBlockedByRole ? "Disponible solo para clientes" : "Escribir resena"}
+            title={isBlockedByRole ? "Disponible solo para clientes" : "Escribir reseña"}
           >
-            Escribir resena
+            Escribir reseña
           </button>
         </div>
 
@@ -149,7 +165,7 @@ const CoffeeCard = ({ cafe }) => {
                 </div>
               ))
             ) : (
-              <p className="text-[10px] italic text-gray-400">Aun no hay resenas. Se el primero.</p>
+              <p className="text-[10px] italic text-gray-400">Aun no hay reseñas. Se el primero.</p>
             )}
           </div>
         )}

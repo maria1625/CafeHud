@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* Hace que el prefijo dark: de Tailwind reaccione a la clase .dark
+   (controlada por el toggle de useThemeStore) en lugar de la
+   preferencia del sistema operativo (prefers-color-scheme). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-brand-dark: var(--brand-dark);
   --color-brand-medium: var(--brand-medium);

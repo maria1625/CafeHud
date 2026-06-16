@@ -8,9 +8,6 @@ import {
 import "../src/index.css";
 
 export function Layout({ children }) {
-  // #region debug-point A:root-layout
-  fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"blank-screen-router",runId:"pre-fix",hypothesisId:"A",location:"app/root.jsx:11",msg:"[DEBUG] Root layout render",data:{hasChildren:Boolean(children)},ts:Date.now()})}).catch(()=>{});
-  // #endregion
   return (
     <html lang="en">
       <head>
@@ -37,8 +34,5 @@ export function Layout({ children }) {
 }
 
 export default function Root() {
-  // #region debug-point A:root-outlet
-  fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"blank-screen-router",runId:"pre-fix",hypothesisId:"A",location:"app/root.jsx:39",msg:"[DEBUG] Root outlet render",data:{},ts:Date.now()})}).catch(()=>{});
-  // #endregion
   return <Outlet />;
 }

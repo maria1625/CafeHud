@@ -19,20 +19,12 @@ function App() {
   const initializing = useAuthStore((state) => state.initializing);
   const initTheme = useThemeStore((state) => state.initTheme);
 
-  // #region debug-point D:app-render
-  fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"blank-screen-router",runId:"pre-fix",hypothesisId:"D",location:"src/App.jsx:17",msg:"[DEBUG] App render",data:{initializing,isAuthenticated},ts:Date.now()})}).catch(()=>{});
-  // #endregion
-
   useEffect(() => {
     if (hasBootstrappedApp) {
       return;
     }
 
     hasBootstrappedApp = true;
-
-    // #region debug-point D:app-initialize-effect
-    fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"blank-screen-router",runId:"pre-fix",hypothesisId:"D",location:"src/App.jsx:21",msg:"[DEBUG] App initialize effect",data:{},ts:Date.now()})}).catch(()=>{});
-    // #endregion
     initTheme();
     initialize();
   }, [initTheme, initialize]);

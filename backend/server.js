@@ -1,3 +1,12 @@
+import { webcrypto } from 'node:crypto';
+
+if (!globalThis.crypto) {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto,
+    configurable: true,
+  });
+}
+
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -5,7 +14,6 @@ import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
-import connectDB from './config/database.js';
 import { config } from './config/environment.js';
 import authRoutes from './routes/auth.js';
 import cafeRoutes from './routes/cafes.js';
@@ -22,8 +30,8 @@ const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, 'swagger.yaml'));
 
 const allowedOrigins = [
-  "http://localhost:5173",
   "http://localhost:3000",
+  config.corsOrigin,
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -57,6 +65,7 @@ app.use(errorHandler);
 
 const startServer = async () => {
   try {
+    const { default: connectDB } = await import('./config/database.js');
     await connectDB();
 
     if (config.nodeEnv !== 'test') {

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useCoffeeStore } from "../store/useCoffeeStore";
+import { formatCOP } from "../utils/formatters";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -75,11 +76,11 @@ const CheckoutPage = () => {
                       {item.brand}
                     </p>
                     <p className="mt-2 text-sm font-bold text-brand-medium dark:text-gray-300">
-                      ${item.price.toFixed(2)} x {item.quantity}
+                      {formatCOP(item.price)} x {item.quantity}
                     </p>
                   </div>
                   <strong className="text-lg font-black text-brand-dark dark:text-white">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatCOP(item.price * item.quantity)}
                   </strong>
                 </article>
               ))}
@@ -97,7 +98,7 @@ const CheckoutPage = () => {
               </div>
               <div className="flex items-center justify-between text-sm font-bold text-brand-medium dark:text-gray-300">
                 <span>Subtotal</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{formatCOP(total)}</span>
               </div>
             </div>
             <div className="mt-6 flex items-end justify-between">
@@ -105,7 +106,7 @@ const CheckoutPage = () => {
                 Total final
               </span>
               <span className="text-3xl font-black tracking-tight text-brand-dark dark:text-white">
-                ${total.toFixed(2)}
+                {formatCOP(total)}
               </span>
             </div>
             <button

@@ -1,4 +1,4 @@
-import { a as reviewApi, i as favoriteApi, n as adminApi, r as cafeApi, t as useAuthStore } from "./assets/useAuthStore-CpwjGBtq.js";
+import { a as reviewApi, i as favoriteApi, n as adminApi, r as cafeApi, t as useAuthStore } from "./assets/useAuthStore-D21mWGkQ.js";
 import { PassThrough } from "node:stream";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { Link, Links, Meta, Navigate, Outlet, Route, Routes, Scripts, ScrollRestoration, ServerRouter, UNSAFE_withComponentProps, useNavigate } from "react-router";
@@ -9,7 +9,7 @@ import { Children, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ArrowRight, Check, Coffee, Minus, Moon, Plus, ShoppingBag, Sun, Trash2, X, ZoomIn } from "lucide-react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -77,19 +77,6 @@ var root_exports = /* @__PURE__ */ __exportAll({
 	default: () => root_default
 });
 function Layout({ children }) {
-	fetch("http://127.0.0.1:7777/event", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({
-			sessionId: "blank-screen-router",
-			runId: "pre-fix",
-			hypothesisId: "A",
-			location: "app/root.jsx:11",
-			msg: "[DEBUG] Root layout render",
-			data: { hasChildren: Boolean(children) },
-			ts: Date.now()
-		})
-	}).catch(() => {});
 	return /* @__PURE__ */ jsxs("html", {
 		lang: "en",
 		children: [/* @__PURE__ */ jsxs("head", { children: [
@@ -127,19 +114,6 @@ function Layout({ children }) {
 	});
 }
 var root_default = UNSAFE_withComponentProps(function Root() {
-	fetch("http://127.0.0.1:7777/event", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({
-			sessionId: "blank-screen-router",
-			runId: "pre-fix",
-			hypothesisId: "A",
-			location: "app/root.jsx:39",
-			msg: "[DEBUG] Root outlet render",
-			data: {},
-			ts: Date.now()
-		})
-	}).catch(() => {});
 	return /* @__PURE__ */ jsx(Outlet, {});
 });
 //#endregion
@@ -203,7 +177,7 @@ var useCoffeeStore = create(persist((set, get) => ({
 				cart: syncCartWithCafes(state.cart, cafes),
 				loading: false
 			}));
-		} catch (err) {
+		} catch {
 			set({
 				error: "Error al cargar el catalogo",
 				loading: false
@@ -214,27 +188,27 @@ var useCoffeeStore = create(persist((set, get) => ({
 		try {
 			const favorites = await favoriteApi.getFavorites();
 			set({ favorites: Array.isArray(favorites) ? favorites.map(String) : [] });
-		} catch (err) {
+		} catch (error) {
 			set({ favorites: [] });
-			console.error("Error al cargar favoritos", err);
+			console.error("Error al cargar favoritos", error);
 		}
 	},
 	toggleFavorite: async (id) => {
 		try {
 			const updatedFavorites = await favoriteApi.toggle(id);
 			set({ favorites: Array.isArray(updatedFavorites) ? updatedFavorites.map(String) : [] });
-		} catch (err) {
-			console.error("Error al actualizar favorito", err);
-			throw err;
+		} catch (error) {
+			console.error("Error al actualizar favorito", error);
+			throw error;
 		}
 	},
 	voteCoffee: async (id) => {
 		try {
 			const updatedCafe = await cafeApi.vote(id);
 			set((state) => ({ cafes: state.cafes.map((cafe) => getCafeId$1(cafe) === String(id) ? updatedCafe : cafe) }));
-		} catch (err) {
-			console.error("Error al votar", err);
-			throw err;
+		} catch (error) {
+			console.error("Error al votar", error);
+			throw error;
 		}
 	},
 	addReview: async (id, reviewData) => {
@@ -245,9 +219,9 @@ var useCoffeeStore = create(persist((set, get) => ({
 			if (updatedUser) useAuthStore.getState().setUser(updatedUser);
 			set((state) => ({ cafes: state.cafes.map((cafe) => getCafeId$1(cafe) === String(id) ? updatedCafe : cafe) }));
 			return response;
-		} catch (err) {
-			console.error("Error al anadir resena", err);
-			throw err;
+		} catch (error) {
+			console.error("Error al anadir resena", error);
+			throw error;
 		}
 	},
 	addToCart: (cafe) => set((state) => {
@@ -282,6 +256,17 @@ var useCoffeeStore = create(persist((set, get) => ({
 	storage: createJSONStorage(() => localStorage),
 	partialize: (state) => ({ cart: state.cart })
 }));
+//#endregion
+//#region src/utils/formatters.js
+var formatCOP = (value) => {
+	if (value == null || Number.isNaN(Number(value))) return "COP 0";
+	return new Intl.NumberFormat("es-CO", {
+		style: "currency",
+		currency: "COP",
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0
+	}).format(Number(value));
+};
 //#endregion
 //#region src/components/layout/CartSidebar.jsx
 var CartSidebar = ({ isOpen, onClose }) => {
@@ -380,9 +365,9 @@ var CartSidebar = ({ isOpen, onClose }) => {
 										children: [/* @__PURE__ */ jsx("h4", {
 											className: "font-black text-brand-dark dark:text-white text-base uppercase leading-tight tracking-tight",
 											children: item.name
-										}), /* @__PURE__ */ jsxs("span", {
+										}), /* @__PURE__ */ jsx("span", {
 											className: "font-black text-brand-dark dark:text-white text-base tracking-tighter",
-											children: ["$", (item.price * item.quantity).toFixed(2)]
+											children: formatCOP(item.price * item.quantity)
 										})]
 									}),
 									/* @__PURE__ */ jsx("p", {
@@ -443,9 +428,9 @@ var CartSidebar = ({ isOpen, onClose }) => {
 							children: [/* @__PURE__ */ jsx("span", {
 								className: "text-[10px] font-black text-brand-medium dark:text-gray-400 uppercase tracking-[0.3em]",
 								children: "Total estimado"
-							}), /* @__PURE__ */ jsxs("span", {
+							}), /* @__PURE__ */ jsx("span", {
 								className: "text-3xl font-black text-brand-dark dark:text-white tracking-tighter",
-								children: ["$", total.toFixed(2)]
+								children: formatCOP(total)
 							})]
 						}), /* @__PURE__ */ jsxs("button", {
 							type: "button",
@@ -1005,6 +990,7 @@ var CoffeeCard = ({ cafe }) => {
 	const cafeId = getCafeId(cafe);
 	const isFavorite = favorites.includes(cafeId);
 	const isUnavailable = !cafe.available;
+	const cafeImageUrl = cafe.imageUrl || "https://via.placeholder.com/800x800.png?text=Sin+imagen";
 	const isClient = !!user && ["client", "user"].includes(user.role);
 	const isBlockedByRole = !!user && !isClient;
 	const requireSession = () => {
@@ -1047,7 +1033,7 @@ var CoffeeCard = ({ cafe }) => {
 				className: "relative h-72 overflow-hidden",
 				children: [
 					/* @__PURE__ */ jsx("img", {
-						src: cafe.imageUrl,
+						src: cafeImageUrl,
 						alt: cafe.name,
 						className: "w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
 					}),
@@ -1087,9 +1073,9 @@ var CoffeeCard = ({ cafe }) => {
 						}), /* @__PURE__ */ jsx("p", {
 							className: "text-xs font-black text-brand-medium dark:text-gray-400 uppercase tracking-[0.2em]",
 							children: cafe.brand
-						})] }), /* @__PURE__ */ jsxs("span", {
+						})] }), /* @__PURE__ */ jsx("span", {
 							className: "text-2xl font-black text-brand-dark dark:text-white tracking-tighter",
-							children: ["$", Number(cafe.price).toFixed(2)]
+							children: formatCOP(cafe.price)
 						})]
 					}),
 					/* @__PURE__ */ jsxs("p", {
@@ -1423,8 +1409,7 @@ var LoginPage = () => {
 var RegisterForm = () => {
 	const { register: registerUser, loading, error: authError } = useAuthStore();
 	const navigate = useNavigate();
-	const { register, handleSubmit, watch, formState: { errors } } = useForm();
-	const password = watch("password");
+	const { register, handleSubmit, getValues, formState: { errors } } = useForm();
 	const onSubmit = async (data) => {
 		try {
 			await registerUser(data);
@@ -1527,7 +1512,7 @@ var RegisterForm = () => {
 							placeholder: "********",
 							...register("confirmPassword", {
 								required: "Confirma tu contrasena",
-								validate: (value) => value === password || "Las contrasenas no coinciden"
+								validate: (value) => value === getValues("password") || "Las contrasenas no coinciden"
 							}),
 							className: `input-premium ${errors.confirmPassword ? "border-red-300 ring-4 ring-red-50" : ""}`
 						}),
@@ -1597,7 +1582,7 @@ var Dashboard = () => {
 				]);
 				const myReviews = await reviewApi.getMine();
 				setReviews(Array.isArray(myReviews) ? myReviews : []);
-			} catch (error) {
+			} catch {
 				setDashboardError("No se pudo actualizar tu panel en este momento.");
 			}
 		};
@@ -1719,9 +1704,9 @@ var Dashboard = () => {
 											children: cafe.brand
 										})]
 									}),
-									/* @__PURE__ */ jsxs("span", {
+									/* @__PURE__ */ jsx("span", {
 										className: "font-black text-brand-dark",
-										children: ["$", cafe.price.toFixed(2)]
+										children: formatCOP(cafe.price)
 									})
 								]
 							}, cafe._id || cafe.id))
@@ -1755,8 +1740,7 @@ var Dashboard = () => {
 											/* @__PURE__ */ jsxs("p", {
 												className: "text-xs font-bold text-brand-medium",
 												children: [
-													"$",
-													item.price.toFixed(2),
+													formatCOP(item.price),
 													" x ",
 													item.quantity
 												]
@@ -1791,7 +1775,7 @@ var Dashboard = () => {
 								]
 							}, item.id)), /* @__PURE__ */ jsxs("div", {
 								className: "flex justify-between border-t border-brand-light pt-5 text-lg font-black text-brand-dark",
-								children: [/* @__PURE__ */ jsx("span", { children: "Total" }), /* @__PURE__ */ jsxs("span", { children: ["$", cartTotal.toFixed(2)] })]
+								children: [/* @__PURE__ */ jsx("span", { children: "Total" }), /* @__PURE__ */ jsx("span", { children: formatCOP(cartTotal) })]
 							})]
 						})]
 					}),
@@ -1893,7 +1877,8 @@ var AdminDashboard = () => {
 	const buildCafePayload = (cafe) => ({
 		...cafe,
 		price: Number(cafe.price),
-		available: Boolean(cafe.available)
+		available: Boolean(cafe.available),
+		imageUrl: cafe.imageUrl || void 0
 	});
 	const handleRoleChange = async (userId, newRole) => {
 		try {
@@ -2115,13 +2100,13 @@ var AdminDashboard = () => {
 									className: "table-cell-admin",
 									children: cafe.origin
 								}),
-								/* @__PURE__ */ jsxs("td", {
+								/* @__PURE__ */ jsx("td", {
 									className: "table-cell-admin",
-									children: ["$", Number(cafe.price).toFixed(2)]
+									children: formatCOP(cafe.price)
 								}),
 								/* @__PURE__ */ jsx("td", {
 									className: "table-cell-admin",
-									children: cafe.available ? "Disponible" : "Oculto"
+									children: cafe.available ? "Disponible" : "No disponible"
 								}),
 								/* @__PURE__ */ jsx("td", {
 									className: "table-cell-admin",
@@ -2298,9 +2283,26 @@ var CafeForm = ({ title, cafe, onChange, onSubmit, submitLabel, secondaryAction 
 			/* @__PURE__ */ jsx("input", {
 				value: cafe.imageUrl,
 				onChange: (event) => onChange("imageUrl", event.target.value),
-				placeholder: "URL de imagen",
-				className: "input-premium",
-				required: true
+				placeholder: "URL de imagen o deja vacío para subir archivo",
+				className: "input-premium"
+			}),
+			/* @__PURE__ */ jsxs("label", {
+				className: "flex flex-col gap-2 rounded-2xl border border-brand-light bg-brand-bg px-5 py-4 text-sm font-black text-brand-dark",
+				children: [/* @__PURE__ */ jsx("span", {
+					className: "uppercase tracking-[0.2em] text-[10px] font-black text-brand-medium",
+					children: "Imagen desde tu equipo"
+				}), /* @__PURE__ */ jsx("input", {
+					type: "file",
+					accept: "image/*",
+					onChange: (event) => {
+						const file = event.target.files?.[0];
+						if (!file) return;
+						const reader = new FileReader();
+						reader.onload = () => onChange("imageUrl", reader.result || "");
+						reader.readAsDataURL(file);
+					},
+					className: "input-premium"
+				})]
 			}),
 			/* @__PURE__ */ jsxs("label", {
 				className: "flex items-center gap-3 rounded-2xl border border-brand-light bg-brand-bg px-5 py-4 text-sm font-black text-brand-dark",
@@ -2432,17 +2434,16 @@ var CheckoutPage = () => {
 									/* @__PURE__ */ jsxs("p", {
 										className: "mt-2 text-sm font-bold text-brand-medium dark:text-gray-300",
 										children: [
-											"$",
-											item.price.toFixed(2),
+											formatCOP(item.price),
 											" x ",
 											item.quantity
 										]
 									})
 								]
 							}),
-							/* @__PURE__ */ jsxs("strong", {
+							/* @__PURE__ */ jsx("strong", {
 								className: "text-lg font-black text-brand-dark dark:text-white",
-								children: ["$", (item.price * item.quantity).toFixed(2)]
+								children: formatCOP(item.price * item.quantity)
 							})
 						]
 					}, item.id))
@@ -2461,7 +2462,7 @@ var CheckoutPage = () => {
 							children: [/* @__PURE__ */ jsx("span", { children: "Productos" }), /* @__PURE__ */ jsx("span", { children: totalItems })]
 						}), /* @__PURE__ */ jsxs("div", {
 							className: "flex items-center justify-between text-sm font-bold text-brand-medium dark:text-gray-300",
-							children: [/* @__PURE__ */ jsx("span", { children: "Subtotal" }), /* @__PURE__ */ jsxs("span", { children: ["$", total.toFixed(2)] })]
+							children: [/* @__PURE__ */ jsx("span", { children: "Subtotal" }), /* @__PURE__ */ jsx("span", { children: formatCOP(total) })]
 						})]
 					}),
 					/* @__PURE__ */ jsxs("div", {
@@ -2469,9 +2470,9 @@ var CheckoutPage = () => {
 						children: [/* @__PURE__ */ jsx("span", {
 							className: "text-[10px] font-black uppercase tracking-[0.3em] text-brand-medium dark:text-gray-400",
 							children: "Total final"
-						}), /* @__PURE__ */ jsxs("span", {
+						}), /* @__PURE__ */ jsx("span", {
 							className: "text-3xl font-black tracking-tight text-brand-dark dark:text-white",
-							children: ["$", total.toFixed(2)]
+							children: formatCOP(total)
 						})]
 					}),
 					/* @__PURE__ */ jsx("button", {
@@ -2508,38 +2509,9 @@ function App() {
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 	const initializing = useAuthStore((state) => state.initializing);
 	const initTheme = useThemeStore((state) => state.initTheme);
-	fetch("http://127.0.0.1:7777/event", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({
-			sessionId: "blank-screen-router",
-			runId: "pre-fix",
-			hypothesisId: "D",
-			location: "src/App.jsx:17",
-			msg: "[DEBUG] App render",
-			data: {
-				initializing,
-				isAuthenticated
-			},
-			ts: Date.now()
-		})
-	}).catch(() => {});
 	useEffect(() => {
 		if (hasBootstrappedApp) return;
 		hasBootstrappedApp = true;
-		fetch("http://127.0.0.1:7777/event", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				sessionId: "blank-screen-router",
-				runId: "pre-fix",
-				hypothesisId: "D",
-				location: "src/App.jsx:21",
-				msg: "[DEBUG] App initialize effect",
-				data: {},
-				ts: Date.now()
-			})
-		}).catch(() => {});
 		initTheme();
 		initialize();
 	}, [initTheme, initialize]);
@@ -2584,27 +2556,14 @@ function App() {
 //#region app/routes/catchall.jsx
 var catchall_exports = /* @__PURE__ */ __exportAll({ default: () => catchall_default });
 var catchall_default = UNSAFE_withComponentProps(function Component() {
-	fetch("http://127.0.0.1:7777/event", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({
-			sessionId: "blank-screen-router",
-			runId: "pre-fix",
-			hypothesisId: "C",
-			location: "app/routes/catchall.jsx:4",
-			msg: "[DEBUG] Catchall route render",
-			data: {},
-			ts: Date.now()
-		})
-	}).catch(() => {});
 	return /* @__PURE__ */ jsx(App, {});
 });
 //#endregion
 //#region \0virtual:react-router/server-manifest
 var server_manifest_default = {
 	"entry": {
-		"module": "/assets/entry.client-DTV6GpAA.js",
-		"imports": ["/assets/preload-helper-C6xl7tY2.js", "/assets/jsx-runtime-CNwQRQxm.js"],
+		"module": "/assets/entry.client-CM08-lPB.js",
+		"imports": ["/assets/preload-helper-CrH_C1E0.js", "/assets/jsx-runtime-BgPukLlu.js"],
 		"css": []
 	},
 	"routes": {
@@ -2621,9 +2580,9 @@ var server_manifest_default = {
 			"hasClientMiddleware": false,
 			"hasDefaultExport": true,
 			"hasErrorBoundary": false,
-			"module": "/assets/root-0B4QhMvI.js",
-			"imports": ["/assets/preload-helper-C6xl7tY2.js", "/assets/jsx-runtime-CNwQRQxm.js"],
-			"css": ["/assets/root-DKSayjZi.css"],
+			"module": "/assets/root-LhO6qfX-.js",
+			"imports": ["/assets/preload-helper-CrH_C1E0.js", "/assets/jsx-runtime-BgPukLlu.js"],
+			"css": ["/assets/root-Cu2cwVrb.css"],
 			"clientActionModule": void 0,
 			"clientLoaderModule": void 0,
 			"clientMiddlewareModule": void 0,
@@ -2642,11 +2601,11 @@ var server_manifest_default = {
 			"hasClientMiddleware": false,
 			"hasDefaultExport": true,
 			"hasErrorBoundary": false,
-			"module": "/assets/catchall-FEGjU-NL.js",
+			"module": "/assets/catchall-BmZzcSEY.js",
 			"imports": [
-				"/assets/preload-helper-C6xl7tY2.js",
-				"/assets/useAuthStore-DAgvxB6L.js",
-				"/assets/jsx-runtime-CNwQRQxm.js"
+				"/assets/preload-helper-CrH_C1E0.js",
+				"/assets/useAuthStore-BGE1HaAA.js",
+				"/assets/jsx-runtime-BgPukLlu.js"
 			],
 			"css": [],
 			"clientActionModule": void 0,
@@ -2655,8 +2614,8 @@ var server_manifest_default = {
 			"hydrateFallbackModule": void 0
 		}
 	},
-	"url": "/assets/manifest-c2adf2fe.js",
-	"version": "c2adf2fe",
+	"url": "/assets/manifest-83bda6e8.js",
+	"version": "83bda6e8",
 	"sri": void 0
 };
 //#endregion

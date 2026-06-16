@@ -4,6 +4,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useCoffeeStore } from "../store/useCoffeeStore";
 import { useThemeStore } from "../store/useThemeStore";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import { formatCOP } from "../utils/formatters";
 
 const Dashboard = () => {
   const { user, loading, refreshMe } = useAuthStore();
@@ -27,7 +28,7 @@ const Dashboard = () => {
         await Promise.all([fetchCafes(), fetchFavorites(), refreshMe()]);
         const myReviews = await reviewApi.getMine();
         setReviews(Array.isArray(myReviews) ? myReviews : []);
-      } catch (error) {
+      } catch {
         setDashboardError("No se pudo actualizar tu panel en este momento.");
       }
     };
@@ -79,7 +80,7 @@ const Dashboard = () => {
           <h3 className="text-4xl font-black text-brand-dark mt-3">{favorites.length}</h3>
         </div>
         <div className="card-premium p-6">
-          <span className="text-[10px] font-black text-brand-medium uppercase tracking-[0.2em]">Resenas</span>
+          <span className="text-[10px] font-black text-brand-medium uppercase tracking-[0.2em]">Reseñas</span>
           <h3 className="text-4xl font-black text-brand-dark mt-3">{reviews.length}</h3>
         </div>
         <div className="card-premium p-6">
@@ -106,7 +107,7 @@ const Dashboard = () => {
                     <h3 className="font-black text-brand-dark">{cafe.name}</h3>
                     <p className="text-xs font-bold text-brand-medium">{cafe.brand}</p>
                   </div>
-                  <span className="font-black text-brand-dark">${cafe.price.toFixed(2)}</span>
+                  <span className="font-black text-brand-dark">{formatCOP(cafe.price)}</span>
                 </div>
               ))}
             </div>
@@ -124,7 +125,7 @@ const Dashboard = () => {
                   <img src={item.imageUrl} alt={item.name} className="h-16 w-16 rounded-xl object-cover" />
                   <div className="flex-1">
                     <h3 className="font-black text-brand-dark">{item.name}</h3>
-                    <p className="text-xs font-bold text-brand-medium">${item.price.toFixed(2)} x {item.quantity}</p>
+                    <p className="text-xs font-bold text-brand-medium">{formatCOP(item.price)} x {item.quantity}</p>
                     {!item.available && (
                       <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-red-600">
                         No disponible
@@ -146,16 +147,16 @@ const Dashboard = () => {
               ))}
               <div className="flex justify-between border-t border-brand-light pt-5 text-lg font-black text-brand-dark">
                 <span>Total</span>
-                <span>${cartTotal.toFixed(2)}</span>
+                <span>{formatCOP(cartTotal)}</span>
               </div>
             </div>
           )}
         </section>
 
         <section className="card-premium p-8 lg:col-span-2">
-          <h2 className="text-2xl font-black text-brand-dark uppercase tracking-wide mb-6">Tus resenas</h2>
+          <h2 className="text-2xl font-black text-brand-dark uppercase tracking-wide mb-6">Tus reseñas</h2>
           {reviews.length === 0 ? (
-            <p className="text-brand-medium font-bold">Cuando publiques una resena, aparecera aqui.</p>
+            <p className="text-brand-medium font-bold">Cuando publiques una reseña, aparecera aqui.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {reviews.map((review) => (
