@@ -4,16 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "react-router dev",
-    "build": "react-router build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "react-router-serve ./build/server/index.js"
-  },
+  "dev": "react-router dev",
+  "build": "react-router build",
+  "lint": "eslint .",
+  "preview": "vite preview",
+  "start": "react-router-serve ./build/server/index.js",
+  "typecheck": "tsc --noEmit",
+  "test": "vitest run --coverage",
+  "test:e2e": "playwright test"
+},
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@react-router/node": "7.17.0",
     "@react-router/serve": "7.17.0",
-    "@hookform/resolvers": "^5.2.2",
     "axios": "^1.16.0",
     "framer-motion": "^12.38.0",
     "isbot": "^5.1.30",
@@ -27,24 +30,40 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "@react-router/dev": "7.17.0",
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.61.0",
+    "@react-router/dev": "7.17.0",
     "@tailwindcss/vite": "^4.2.4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.0",
+    "@vitest/coverage-v8": "^4.1.9",
     "autoprefixer": "^10.4.27",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "jsdom": "^29.1.1",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
-    "vite": "^8.0.0"
+    "typescript": "^6.0.3",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.9"
   },
   "supportedArchitectures": {
-    "os": ["linux", "win32"],
-    "cpu": ["x64", "arm64"],
-    "libc": ["musl", "glibc"]
+    "os": [
+      "linux",
+      "win32"
+    ],
+    "cpu": [
+      "x64",
+      "arm64"
+    ],
+    "libc": [
+      "musl",
+      "glibc"
+    ]
   }
 }
