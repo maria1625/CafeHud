@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 let isHandlingUnauthorized = false;
 
 const api = axios.create({
@@ -21,6 +21,8 @@ api.interceptors.response.use(
 
       isHandlingUnauthorized = true;
 
+      let shouldRedirect = false;
+
       try {
         await api.post("/auth/logout");
       } catch (logoutError) {
@@ -32,12 +34,13 @@ api.interceptors.response.use(
         const { useAuthStore } = await import("../store/useAuthStore");
         useAuthStore.getState().setUser(null);
 
-        if (typeof window !== "undefined" && !["/login", "/register"].includes(window.location.pathname)) {
-          window.location.replace("/login");
-          return Promise.reject(error);
-        }
+        shouldRedirect = typeof window !== "undefined" && !["/login", "/register"].includes(window.location.pathname);
 
         isHandlingUnauthorized = false;
+      }
+
+      if (shouldRedirect) {
+        window.location.replace("/login");
       }
     }
     return Promise.reject(error);
@@ -78,6 +81,9 @@ export const adminApi = {
   getCafes: async () => unwrap(await api.get("/admin/cafes")),
   createCafe: async (cafeData) => unwrap(await api.post("/admin/cafes", cafeData)),
   updateCafe: async (cafeId, cafeData) => unwrap(await api.put(`/admin/cafes/${cafeId}`, cafeData)),
+  getInventory: async () => unwrap(await api.get("/admin/inventory")),
+  getLowStock: async () => unwrap(await api.get("/admin/inventory/low-stock")),
+  updateCafeInventory: async (cafeId, inventoryData) => unwrap(await api.patch(`/admin/cafes/${cafeId}/inventory`, inventoryData)),
   deleteCafe: async (cafeId) => unwrap(await api.delete(`/admin/cafes/${cafeId}`)),
   getReviews: async () => unwrap(await api.get("/admin/reviews")),
   deleteReview: async (reviewId) => unwrap(await api.delete(`/admin/reviews/${reviewId}`)),

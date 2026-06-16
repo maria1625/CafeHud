@@ -14,6 +14,8 @@ const initialCafes = [
     price: 14.99,
     rating: 4.4,
     votes: 156,
+    stock: 100,
+    minimumStock: 20,
     available: false,
     imageUrl: 'https://images.unsplash.com/photo-1559525839-b184a4d698c7?auto=format&fit=crop&w=800&q=80'
   },
@@ -27,6 +29,8 @@ const initialCafes = [
     price: 16.5,
     rating: 4.6,
     votes: 189,
+    stock: 28,
+    minimumStock: 5,
     available: true,
     imageUrl: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=800&q=80'
   },
@@ -40,6 +44,8 @@ const initialCafes = [
     price: 18.99,
     rating: 4.8,
     votes: 245,
+    stock: 18,
+    minimumStock: 5,
     available: true,
     imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80'
   },
@@ -53,6 +59,8 @@ const initialCafes = [
     price: 15.75,
     rating: 4.6,
     votes: 210,
+    stock: 89,
+    minimumStock: 8,
     available: true,
     imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80'
   },
@@ -66,6 +74,8 @@ const initialCafes = [
     price: 17.25,
     rating: 4.5,
     votes: 132,
+    stock: 14,
+    minimumStock: 5,
     available: true,
     imageUrl: 'https://images.unsplash.com/photo-1580915411954-282cb1b0d780?auto=format&fit=crop&w=800&q=80'
   },
@@ -79,6 +89,8 @@ const initialCafes = [
     price: 19.5,
     rating: 4.9,
     votes: 312,
+    stock: 96,
+    minimumStock: 8,
     available: true,
     imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80'
   }
@@ -119,6 +131,28 @@ export const seedDatabase = async () => {
     if (cafesCount === 0) {
       await Cafe.insertMany(initialCafes);
       console.log('Datos iniciales de cafés poblados');
+    } else {
+      const cafesMissingInventory = await Cafe.find({
+        $or: [
+          { stock: { $exists: false } },
+          { minimumStock: { $exists: false } }
+        ]
+      });
+
+      if (cafesMissingInventory.length) {
+        await Promise.all(
+          cafesMissingInventory.map(async (cafe) => {
+            if (cafe.stock === undefined) {
+              cafe.stock = cafe.available ? 10 : 0;
+            }
+            if (cafe.minimumStock === undefined) {
+              cafe.minimumStock = 5;
+            }
+            await cafe.save();
+          })
+        );
+        console.log(`Inventario inicial agregado a ${cafesMissingInventory.length} cafés existentes`);
+      }
     }
 
     const adminEmail = 'admin@cafehub.com';

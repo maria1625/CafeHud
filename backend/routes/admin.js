@@ -6,8 +6,11 @@ import {
   updateUserRole,
   deleteUser,
   getAllCafes,
+  getInventory,
+  getLowStockCafes,
   createCafe,
   updateCafe,
+  updateCafeInventory,
   deleteCafe,
   getAllReviews,
   deleteReview
@@ -23,7 +26,14 @@ const cafeValidation = [
   body('roast').trim().isIn(['Claro', 'Medio', 'Oscuro']).withMessage('Tueste invalido'),
   body('price').isFloat({ min: 0 }).withMessage('Precio invalido'),
   body('imageUrl').trim().notEmpty().withMessage('La imagen es obligatoria'),
+  body('stock').optional().isInt({ min: 0 }).withMessage('Stock invalido'),
+  body('minimumStock').optional().isInt({ min: 0 }).withMessage('Stock minimo invalido'),
   body('available').optional().isBoolean().withMessage('Disponibilidad invalida')
+];
+
+const inventoryValidation = [
+  body('stock').optional().isInt({ min: 0 }).withMessage('Stock invalido'),
+  body('minimumStock').optional().isInt({ min: 0 }).withMessage('Stock minimo invalido')
 ];
 
 // All admin routes require authentication and admin role
@@ -39,7 +49,12 @@ router.delete('/users/:id', deleteUser);
 router.get('/cafes', getAllCafes);
 router.post('/cafes', cafeValidation, createCafe);
 router.put('/cafes/:id', cafeValidation, updateCafe);
+router.patch('/cafes/:id/inventory', inventoryValidation, updateCafeInventory);
 router.delete('/cafes/:id', deleteCafe);
+
+// Inventory module
+router.get('/inventory', getInventory);
+router.get('/inventory/low-stock', getLowStockCafes);
 
 // Review management
 router.get('/reviews', getAllReviews);

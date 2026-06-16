@@ -8,4 +8,7 @@ export default defineConfig({
     reactRouter(),
     tailwindcss(),
   ],
+  server: {
+    port: 3000,
+  },
 })

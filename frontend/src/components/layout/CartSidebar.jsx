@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, X, ZoomIn } from "lucide-react";
 import { useCoffeeStore } from "../../store/useCoffeeStore";
+import { formatCOP } from "../../utils/formatters";
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const { cart, removeFromCart, addToCart, clearItemFromCart } = useCoffeeStore();
@@ -19,23 +20,23 @@ const CartSidebar = ({ isOpen, onClose }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <Motion.div
           className="fixed inset-0 z-50 overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <motion.div
+          <Motion.div
             className="absolute inset-0 bg-black/80 backdrop-blur-md"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-          ></motion.div>
+          ></Motion.div>
 
-          <motion.div
+          <Motion.div
             className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-brand-beige shadow-2xl flex flex-col border-l border-brand-light/20"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -97,7 +98,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                       <div className="flex justify-between items-start">
                         <h4 className="font-black text-brand-dark dark:text-white text-base uppercase leading-tight tracking-tight">{item.name}</h4>
                         <span className="font-black text-brand-dark dark:text-white text-base tracking-tighter">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          {formatCOP(item.price * item.quantity)}
                         </span>
                       </div>
                       <p className="text-[10px] text-brand-medium dark:text-gray-400 font-bold uppercase tracking-[0.2em] mt-2 mb-4">
@@ -149,7 +150,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
               <div className="p-8 border-t border-brand-light/20 bg-brand-bg dark:bg-brand-dark/20">
                 <div className="flex justify-between items-end mb-8">
                   <span className="text-[10px] font-black text-brand-medium dark:text-gray-400 uppercase tracking-[0.3em]">Total estimado</span>
-                  <span className="text-3xl font-black text-brand-dark dark:text-white tracking-tighter">${total.toFixed(2)}</span>
+                  <span className="text-3xl font-black text-brand-dark dark:text-white tracking-tighter">{formatCOP(total)}</span>
                 </div>
                 <button
                   type="button"
@@ -161,11 +162,11 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 </button>
               </div>
             )}
-          </motion.div>
+          </Motion.div>
 
           <AnimatePresence>
             {previewImage && (
-              <motion.div
+              <Motion.div
                 className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90"
                 onClick={() => setPreviewImage(null)}
                 initial={{ opacity: 0 }}
@@ -173,7 +174,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <motion.div
+                <Motion.div
                   className="relative max-w-4xl w-full aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10"
                   onClick={(event) => event.stopPropagation()}
                   initial={{ scale: 0.96, opacity: 0 }}
@@ -190,11 +191,11 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   >
                     <X className="w-6 h-6" />
                   </button>
-                </motion.div>
-              </motion.div>
+                </Motion.div>
+              </Motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </Motion.div>
       )}
     </AnimatePresence>
   );

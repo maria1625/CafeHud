@@ -26,7 +26,7 @@ const ReviewModal = ({ cafe, isOpen, onClose }) => {
       setRating(5);
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || "No se pudo publicar la resena.");
+      setError(err.response?.data?.message || "No se pudo publicar la reseña.");
     } finally {
       setSaving(false);
     }
@@ -40,7 +40,7 @@ const ReviewModal = ({ cafe, isOpen, onClose }) => {
         <div className="p-10">
           <div className="flex justify-between items-start mb-8">
             <div>
-              <h2 className="text-2xl font-black text-brand-dark dark:text-white uppercase tracking-tighter">Deja tu resena</h2>
+              <h2 className="text-2xl font-black text-brand-dark dark:text-white uppercase tracking-tighter">Deja tu reseña</h2>
               <p className="text-[10px] font-black text-brand-medium dark:text-gray-400 uppercase tracking-widest mt-1">
                 Compartiendo sobre {cafe.name}
               </p>
@@ -94,7 +94,7 @@ const ReviewModal = ({ cafe, isOpen, onClose }) => {
             )}
 
             <button type="submit" disabled={saving} className="w-full btn-premium py-6 group">
-              <span className="font-black uppercase tracking-[0.2em]">{saving ? "Publicando..." : "Publicar resena"}</span>
+              <span className="font-black uppercase tracking-[0.2em]">{saving ? "Publicando..." : "Publicar reseña"}</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
           </form>

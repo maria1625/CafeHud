@@ -37,6 +37,42 @@ export const deleteUser = asyncHandler(async (req, res) => {
 
 export const getAllCafes = asyncHandler(async (req, res) => {
   const cafes = await Cafe.find().populate('reviews');
+  // #region debug-point B:get-all-cafes
+  fetch("http://127.0.0.1:7777/event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: "inventory-not-reflecting",
+      runId: "pre-fix",
+      hypothesisId: "B",
+      location: "adminController.js:getAllCafes",
+      msg: "[DEBUG] backend returning cafes to admin",
+      data: {
+        total: cafes.length,
+        sample: cafes.slice(0, 3).map((cafe) => ({
+          id: cafe._id,
+          name: cafe.name,
+          stock: cafe.stock,
+          minimumStock: cafe.minimumStock
+        }))
+      },
+      ts: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
+  res.status(200).json({ success: true, data: cafes });
+});
+
+export const getInventory = asyncHandler(async (req, res) => {
+  const cafes = await Cafe.find().select('name brand origin price stock minimumStock available imageUrl');
+  res.status(200).json({ success: true, data: cafes });
+});
+
+export const getLowStockCafes = asyncHandler(async (req, res) => {
+  const cafes = await Cafe.find({
+    $expr: { $lte: ['$stock', '$minimumStock'] }
+  }).select('name brand origin price stock minimumStock available imageUrl');
+
   res.status(200).json({ success: true, data: cafes });
 });
 
@@ -46,8 +82,44 @@ export const createCafe = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: 'Error de validacion', errors: errors.array() });
   }
 
+  // #region debug-point B:create-received
+  fetch("http://127.0.0.1:7777/event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: "inventory-not-reflecting",
+      runId: "pre-fix",
+      hypothesisId: "B",
+      location: "adminController.js:createCafe",
+      msg: "[DEBUG] backend received create payload",
+      data: req.body,
+      ts: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
   const cafe = new Cafe(req.body);
   await cafe.save();
+  // #region debug-point B:create-saved
+  fetch("http://127.0.0.1:7777/event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: "inventory-not-reflecting",
+      runId: "pre-fix",
+      hypothesisId: "B",
+      location: "adminController.js:createCafe",
+      msg: "[DEBUG] backend saved created cafe",
+      data: {
+        id: cafe._id,
+        name: cafe.name,
+        stock: cafe.stock,
+        minimumStock: cafe.minimumStock,
+        available: cafe.available
+      },
+      ts: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
   res.status(201).json({ success: true, data: cafe });
 });
 
@@ -58,10 +130,71 @@ export const updateCafe = asyncHandler(async (req, res) => {
   }
 
   const { id } = req.params;
+  // #region debug-point B:update-received
+  fetch("http://127.0.0.1:7777/event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: "inventory-not-reflecting",
+      runId: "pre-fix",
+      hypothesisId: "B",
+      location: "adminController.js:updateCafe",
+      msg: "[DEBUG] backend received update payload",
+      data: { id, payload: req.body },
+      ts: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
   const cafe = await Cafe.findByIdAndUpdate(id, req.body, { returnDocument: 'after', runValidators: true });
   if (!cafe) {
     return res.status(404).json({ success: false, message: 'Cafe no encontrado' });
   }
+  // #region debug-point B:update-saved
+  fetch("http://127.0.0.1:7777/event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: "inventory-not-reflecting",
+      runId: "pre-fix",
+      hypothesisId: "B",
+      location: "adminController.js:updateCafe",
+      msg: "[DEBUG] backend updated cafe persisted",
+      data: {
+        id: cafe._id,
+        name: cafe.name,
+        stock: cafe.stock,
+        minimumStock: cafe.minimumStock,
+        available: cafe.available
+      },
+      ts: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
+  res.status(200).json({ success: true, data: cafe });
+});
+
+export const updateCafeInventory = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, message: 'Error de validacion', errors: errors.array() });
+  }
+
+  const { id } = req.params;
+  const { stock, minimumStock } = req.body;
+
+  const update = {};
+  if (stock !== undefined) update.stock = stock;
+  if (minimumStock !== undefined) update.minimumStock = minimumStock;
+
+  if (!Object.keys(update).length) {
+    return res.status(400).json({ success: false, message: 'No hay campos de inventario para actualizar' });
+  }
+
+  const cafe = await Cafe.findByIdAndUpdate(id, update, { returnDocument: 'after', runValidators: true });
+  if (!cafe) {
+    return res.status(404).json({ success: false, message: 'Cafe no encontrado' });
+  }
+
   res.status(200).json({ success: true, data: cafe });
 });
 

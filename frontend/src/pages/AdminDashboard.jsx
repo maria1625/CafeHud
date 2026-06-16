@@ -1,6 +1,7 @@
 import { Children, useEffect, useMemo, useState } from "react";
 import { adminApi } from "../api/api";
 import { useAuthStore } from "../store/useAuthStore";
+import { formatCOP } from "../utils/formatters";
 
 const emptyCafe = {
   name: "",
@@ -9,6 +10,8 @@ const emptyCafe = {
   origin: "",
   roast: "Medio",
   price: "0",
+  stock: "0",
+  minimumStock: "0",
   available: true,
   imageUrl: ""
 };
@@ -29,6 +32,7 @@ const AdminDashboard = () => {
     users: users.length,
     cafes: cafes.length,
     reviews: reviews.length,
+    lowStock: cafes.filter((cafe) => Number(cafe.stock || 0) <= Number(cafe.minimumStock || 0)).length,
     averageRating: reviews.length
       ? (reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / reviews.length).toFixed(1)
       : "0.0"
@@ -43,6 +47,31 @@ const AdminDashboard = () => {
         adminApi.getCafes(),
         adminApi.getReviews()
       ]);
+      // #region debug-point C:load-admin-data
+      fetch("http://127.0.0.1:7777/event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: "inventory-not-reflecting",
+          runId: "pre-fix",
+          hypothesisId: "C",
+          location: "AdminDashboard.jsx:loadAdminData",
+          msg: "[DEBUG] admin data loaded from api",
+          data: {
+            cafesCount: Array.isArray(cafesRes) ? cafesRes.length : -1,
+            sample: Array.isArray(cafesRes)
+              ? cafesRes.slice(0, 3).map((cafe) => ({
+                  id: cafe._id,
+                  name: cafe.name,
+                  stock: cafe.stock,
+                  minimumStock: cafe.minimumStock,
+                }))
+              : [],
+          },
+          ts: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
       setUsers(Array.isArray(usersRes) ? usersRes : []);
       setCafes(Array.isArray(cafesRes) ? cafesRes : []);
       setReviews(Array.isArray(reviewsRes) ? reviewsRes : []);
@@ -59,11 +88,55 @@ const AdminDashboard = () => {
     }
   }, [isAdmin]);
 
+  useEffect(() => {
+    // #region debug-point C:inventory-render
+    fetch("http://127.0.0.1:7777/event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: "inventory-not-reflecting",
+        runId: "pre-fix",
+        hypothesisId: "C",
+        location: "AdminDashboard.jsx:load/render",
+        msg: "[DEBUG] cafes state updated in admin dashboard",
+        data: {
+          total: cafes.length,
+          sample: cafes.slice(0, 3).map((cafe) => ({
+            id: cafe._id,
+            name: cafe.name,
+            stock: cafe.stock,
+            minimumStock: cafe.minimumStock,
+          })),
+        },
+        ts: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
+  }, [cafes]);
+
   const buildCafePayload = (cafe) => ({
     ...cafe,
     price: Number(cafe.price),
-    available: Boolean(cafe.available)
+    stock: Number(cafe.stock),
+    minimumStock: Number(cafe.minimumStock),
+    available: Boolean(cafe.available),
+    imageUrl: cafe.imageUrl || undefined
   });
+
+  const inventoryStatus = (stock, minimumStock) => {
+    if (stock <= 0) {
+      return { label: "Agotado", className: "bg-red-50 text-red-700 border-red-200" };
+    }
+    if (stock <= minimumStock) {
+      return { label: "Bajo", className: "bg-amber-50 text-amber-800 border-amber-200" };
+    }
+    return { label: "OK", className: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+  };
+
+  const goToEditCafe = (cafe) => {
+    handleEditCafe(cafe);
+    setActiveTab("cafes");
+  };
 
   const handleRoleChange = async (userId, newRole) => {
     try {
@@ -88,11 +161,31 @@ const AdminDashboard = () => {
     event.preventDefault();
     setAdminError("");
     try {
-      const created = await adminApi.createCafe(buildCafePayload(newCafe));
-      setCafes((current) => [...current, created]);
+      // #region debug-point A:create-payload
+      fetch("http://127.0.0.1:7777/event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: "inventory-not-reflecting",
+          runId: "pre-fix",
+          hypothesisId: "A",
+          location: "AdminDashboard.jsx:handleCreateCafe",
+          msg: "[DEBUG] create cafe payload before api call",
+          data: buildCafePayload(newCafe),
+          ts: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+      await adminApi.createCafe(buildCafePayload(newCafe));
       setNewCafe(emptyCafe);
+      await loadAdminData();
+      setActiveTab("inventory");
     } catch (error) {
-      setAdminError(error.response?.data?.message || "No se pudo crear el cafe.");
+      setAdminError(
+        error.response?.data?.errors?.[0]?.msg ||
+        error.response?.data?.message ||
+        "No se pudo crear el cafe."
+      );
     }
   };
 
@@ -105,6 +198,8 @@ const AdminDashboard = () => {
       origin: cafe.origin || "",
       roast: cafe.roast || "Medio",
       price: String(cafe.price ?? 0),
+      stock: String(cafe.stock ?? 0),
+      minimumStock: String(cafe.minimumStock ?? 0),
       available: cafe.available ?? true,
       imageUrl: cafe.imageUrl || ""
     });
@@ -114,12 +209,32 @@ const AdminDashboard = () => {
   const handleSaveCafe = async (cafeId) => {
     setAdminError("");
     try {
-      const updated = await adminApi.updateCafe(cafeId, buildCafePayload(editingCafeData));
-      setCafes((current) => current.map((cafe) => cafe._id === cafeId ? updated : cafe));
+      // #region debug-point A:update-payload
+      fetch("http://127.0.0.1:7777/event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: "inventory-not-reflecting",
+          runId: "pre-fix",
+          hypothesisId: "A",
+          location: "AdminDashboard.jsx:handleSaveCafe",
+          msg: "[DEBUG] update cafe payload before api call",
+          data: { cafeId, payload: buildCafePayload(editingCafeData) },
+          ts: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+      await adminApi.updateCafe(cafeId, buildCafePayload(editingCafeData));
+      await loadAdminData();
       setEditingCafeId(null);
       setEditingCafeData(emptyCafe);
+      setActiveTab("inventory");
     } catch (error) {
-      setAdminError(error.response?.data?.message || "No se pudo actualizar el cafe.");
+      setAdminError(
+        error.response?.data?.errors?.[0]?.msg ||
+        error.response?.data?.message ||
+        "No se pudo actualizar el cafe."
+      );
     }
   };
 
@@ -135,12 +250,12 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteReview = async (reviewId) => {
-    if (!confirm("Seguro que deseas eliminar esta resena?")) return;
+    if (!confirm("Seguro que deseas eliminar esta reseña?")) return;
     try {
       await adminApi.deleteReview(reviewId);
       setReviews((current) => current.filter((review) => review._id !== reviewId));
     } catch (error) {
-      setAdminError(error.response?.data?.message || "No se pudo eliminar la resena.");
+      setAdminError(error.response?.data?.message || "No se pudo eliminar la reseña.");
     }
   };
 
@@ -163,7 +278,7 @@ const AdminDashboard = () => {
     <div className="max-w-7xl mx-auto w-full px-4 py-10">
       <header className="mb-8">
         <h1 className="text-4xl font-black text-brand-dark tracking-tight">Panel de administracion</h1>
-        <p className="text-brand-medium font-bold mt-2">Gestiona usuarios, cafes y resenas conectadas a la base de datos.</p>
+        <p className="text-brand-medium font-bold mt-2">Gestiona usuarios, cafes y reseñas conectadas a la base de datos.</p>
       </header>
 
       {adminError && (
@@ -182,7 +297,7 @@ const AdminDashboard = () => {
           <strong className="block text-3xl font-black text-brand-dark mt-2">{stats.cafes}</strong>
         </div>
         <div className="card-premium p-5">
-          <span className="text-[10px] font-black text-brand-medium uppercase tracking-[0.2em]">Resenas</span>
+          <span className="text-[10px] font-black text-brand-medium uppercase tracking-[0.2em]">Reseñas</span>
           <strong className="block text-3xl font-black text-brand-dark mt-2">{stats.reviews}</strong>
         </div>
         <div className="card-premium p-5">
@@ -194,25 +309,20 @@ const AdminDashboard = () => {
       <div className="mb-8 flex flex-wrap gap-3">
         {[
           ["cafes", `Cafes (${cafes.length})`],
-          ["reviews", `Resenas (${reviews.length})`],
+          ["inventory", `Inventario (${stats.lowStock} bajos)`],
+          ["reviews", `Reseñas (${reviews.length})`],
           ["users", `Usuarios (${users.length})`],
         ].map(([tab, label]) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`rounded-xl px-5 py-3 text-xs font-black uppercase tracking-widest transition-all ${
-              activeTab === tab ? "bg-brand-dark text-white shadow-lg" : "bg-brand-beige text-brand-dark border border-brand-light"
+              activeTab === tab ? "bg-brand-dark dark:bg-white text-white dark:text-black shadow-lg" : "bg-brand-beige text-brand-dark border border-brand-light"
             }`}
           >
             {label}
           </button>
         ))}
-        <button
-          onClick={loadAdminData}
-          className="rounded-xl px-5 py-3 text-xs font-black uppercase tracking-widest bg-white text-brand-dark border border-brand-light"
-        >
-          Actualizar
-        </button>
       </div>
 
       {loading ? (
@@ -245,34 +355,92 @@ const AdminDashboard = () => {
                   }}
                 />
               )}
+            </section>
+          )}
 
-              <DataTable
-                headers={["Nombre", "Marca", "Origen", "Precio", "Estado", "Acciones"]}
-                emptyMessage="No hay cafes registrados."
-              >
-                {cafes.map((cafe) => (
-                  <tr key={cafe._id}>
-                    <td className="table-cell-admin font-black">{cafe.name}</td>
-                    <td className="table-cell-admin">{cafe.brand}</td>
-                    <td className="table-cell-admin">{cafe.origin}</td>
-                    <td className="table-cell-admin">${Number(cafe.price).toFixed(2)}</td>
-                    <td className="table-cell-admin">{cafe.available ? "Disponible" : "Oculto"}</td>
-                    <td className="table-cell-admin">
-                      <div className="flex gap-2">
-                        <button onClick={() => handleEditCafe(cafe)} className="btn-table-primary">Editar</button>
-                        <button onClick={() => handleDeleteCafe(cafe._id)} className="btn-table-danger">Eliminar</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </DataTable>
+          {activeTab === "inventory" && (
+            <section className="space-y-6">
+              <div className="card-premium p-6">
+                <h2 className="text-2xl font-black text-brand-dark">Inventario</h2>
+                <p className="text-brand-medium font-bold mt-2">Consulta el stock por producto y abre la edicion cuando un cafe tenga stock bajo.</p>
+              </div>
+
+              {cafes.length ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {[...cafes]
+                    .sort((a, b) => {
+                      const aLow = Number(a.stock ?? 0) <= Number(a.minimumStock ?? 0) ? 1 : 0;
+                      const bLow = Number(b.stock ?? 0) <= Number(b.minimumStock ?? 0) ? 1 : 0;
+                      return bLow - aLow;
+                    })
+                    .map((cafe) => {
+                      const stock = Number(cafe.stock ?? 0);
+                      const minimumStock = Number(cafe.minimumStock ?? 0);
+                      const status = inventoryStatus(stock, minimumStock);
+                      const isLowStock = stock <= minimumStock;
+
+                      return (
+                        <article key={cafe._id} className="card-premium overflow-hidden">
+                          <img
+                            src={cafe.imageUrl}
+                            alt={cafe.name}
+                            className="h-52 w-full object-cover"
+                          />
+                          <div className="p-6 space-y-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <h3 className="text-xl font-black text-brand-dark leading-tight">{cafe.name}</h3>
+                                <p className="mt-1 text-xs font-black uppercase tracking-[0.2em] text-brand-medium">{cafe.brand}</p>
+                              </div>
+                              <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-widest ${status.className}`}>
+                                {status.label}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="rounded-2xl border border-brand-light bg-brand-bg px-4 py-4">
+                                <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-brand-medium">Stock</span>
+                                <strong className="mt-2 block text-2xl font-black text-brand-dark">{stock}</strong>
+                              </div>
+                              <div className="rounded-2xl border border-brand-light bg-brand-bg px-4 py-4">
+                                <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-brand-medium">Stock mínimo</span>
+                                <strong className="mt-2 block text-2xl font-black text-brand-dark">{minimumStock}</strong>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="rounded-2xl border border-brand-light bg-brand-bg px-4 py-4">
+                                <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-brand-medium">Origen</span>
+                                <strong className="mt-2 block text-base font-black text-brand-dark">{cafe.origin}</strong>
+                              </div>
+                              <div className="rounded-2xl border border-brand-light bg-brand-bg px-4 py-4">
+                                <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-brand-medium">Precio</span>
+                                <strong className="mt-2 block text-base font-black text-brand-dark">{formatCOP(cafe.price)}</strong>
+                              </div>
+                            </div>
+                            <div className="flex gap-3">
+                              <button onClick={() => goToEditCafe(cafe)} className="btn-table-primary flex-1">
+                                {isLowStock ? "Stock bajo: editar" : "Editar"}
+                              </button>
+                              <button onClick={() => handleDeleteCafe(cafe._id)} className="btn-table-danger flex-1">
+                                Eliminar
+                              </button>
+                            </div>
+                          </div>
+                        </article>
+                      );
+                    })}
+                </div>
+              ) : (
+                <div className="card-premium px-6 py-10 text-center font-bold text-brand-medium">
+                  No hay cafes registrados.
+                </div>
+              )}
             </section>
           )}
 
           {activeTab === "reviews" && (
             <DataTable
               headers={["Usuario", "Cafe", "Calificacion", "Comentario", "Acciones"]}
-              emptyMessage="No hay resenas registradas."
+              emptyMessage="No hay reseñas registradas."
             >
               {reviews.map((review) => (
                 <tr key={review._id}>
@@ -326,6 +494,19 @@ const CafeForm = ({ title, cafe, onChange, onSubmit, submitLabel, secondaryActio
   <section className="card-premium p-6 sm:p-8">
     <h2 className="text-2xl font-black text-brand-dark mb-6">{title}</h2>
     <form onSubmit={onSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="lg:col-span-2 rounded-3xl border border-brand-light bg-brand-bg p-4">
+        {cafe.imageUrl ? (
+          <img
+            src={cafe.imageUrl}
+            alt={cafe.name || "Vista previa del cafe"}
+            className="h-56 w-full rounded-2xl object-cover"
+          />
+        ) : (
+          <div className="flex h-56 w-full items-center justify-center rounded-2xl border border-dashed border-brand-light text-sm font-bold text-brand-medium">
+            La imagen aparecera aqui
+          </div>
+        )}
+      </div>
       <input value={cafe.name} onChange={(event) => onChange("name", event.target.value)} placeholder="Nombre" className="input-premium" required />
       <input value={cafe.brand} onChange={(event) => onChange("brand", event.target.value)} placeholder="Marca" className="input-premium" required />
       <input value={cafe.origin} onChange={(event) => onChange("origin", event.target.value)} placeholder="Origen" className="input-premium" required />
@@ -335,11 +516,27 @@ const CafeForm = ({ title, cafe, onChange, onSubmit, submitLabel, secondaryActio
         <option value="Oscuro">Oscuro</option>
       </select>
       <input type="number" value={cafe.price} onChange={(event) => onChange("price", event.target.value)} placeholder="Precio" className="input-premium" min="0" step="0.01" required />
-      <input value={cafe.imageUrl} onChange={(event) => onChange("imageUrl", event.target.value)} placeholder="URL de imagen" className="input-premium" required />
-      <label className="flex items-center gap-3 rounded-2xl border border-brand-light bg-brand-bg px-5 py-4 text-sm font-black text-brand-dark">
-        <input type="checkbox" checked={cafe.available} onChange={(event) => onChange("available", event.target.checked)} />
-        Disponible para clientes
+      <input type="number" value={cafe.stock} onChange={(event) => onChange("stock", event.target.value)} placeholder="Stock" className="input-premium" min="0" step="1" required />
+      <input type="number" value={cafe.minimumStock} onChange={(event) => onChange("minimumStock", event.target.value)} placeholder="Stock mínimo" className="input-premium" min="0" step="1" required />
+      <input value={cafe.imageUrl} onChange={(event) => onChange("imageUrl", event.target.value)} placeholder="URL de imagen o deja vacío para subir archivo" className="input-premium" />
+      <label className="flex flex-col gap-2 rounded-2xl border border-brand-light bg-brand-bg px-5 py-4 text-sm font-black text-brand-dark">
+        <span className="uppercase tracking-[0.2em] text-[10px] font-black text-brand-medium">Imagen desde tu equipo</span>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => onChange("imageUrl", reader.result || "");
+            reader.readAsDataURL(file);
+          }}
+          className="input-premium"
+        />
       </label>
+      <div className="rounded-2xl border border-brand-light bg-brand-bg px-5 py-4 text-sm font-black text-brand-dark">
+        Disponible para clientes segun el stock registrado
+      </div>
       <textarea value={cafe.description} onChange={(event) => onChange("description", event.target.value)} placeholder="Descripcion" rows="3" className="input-premium lg:col-span-2" required />
       <div className="lg:col-span-2 flex flex-wrap gap-3">
         <button type="submit" className="btn-premium">{submitLabel}</button>

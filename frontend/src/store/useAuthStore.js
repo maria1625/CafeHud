@@ -51,7 +51,7 @@ export const useAuthStore = create((set, get) => ({
       const user = extractUser(response);
       persistUser(user);
       set({ user, isAuthenticated: true, initializing: false, loading: false });
-    } catch (err) {
+    } catch {
       persistUser(null);
       set({ user: null, isAuthenticated: false, initializing: false, loading: false });
     }
@@ -73,8 +73,8 @@ export const useAuthStore = create((set, get) => ({
       persistUser(user);
       set({ user, isAuthenticated: true, loading: false, error: null });
       return user;
-    } catch (err) {
-      const message = err.response?.data?.message || 'Credenciales invalidas';
+    } catch (error) {
+      const message = error.response?.data?.message || 'Credenciales invalidas';
       set({ error: message, loading: false });
       throw new Error(message);
     }
@@ -88,8 +88,8 @@ export const useAuthStore = create((set, get) => ({
       persistUser(user);
       set({ user, isAuthenticated: true, loading: false, error: null });
       return user;
-    } catch (err) {
-      const message = err.response?.data?.message || 'Error al registrarse';
+    } catch (error) {
+      const message = error.response?.data?.message || 'Error al registrarse';
       set({ error: message, loading: false });
       throw new Error(message);
     }
@@ -99,8 +99,8 @@ export const useAuthStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       await authApi.logout();
-    } catch (err) {
-      console.warn('Error cerrando sesion:', err);
+    } catch (error) {
+      console.warn('Error cerrando sesion:', error);
     }
     persistUser(null);
     set({ user: null, isAuthenticated: false, loading: false, error: null });

@@ -14,13 +14,30 @@ const syncCartWithCafes = (cart, cafes) => {
       return item;
     }
 
+    const stock = Number(updatedCafe.stock);
+    if (Number.isFinite(stock)) {
+      if (stock <= 0) {
+        return null;
+      }
+      const clampedQuantity = Math.min(Number(item.quantity || 0), stock);
+      if (clampedQuantity <= 0) {
+        return null;
+      }
+      return {
+        ...item,
+        ...updatedCafe,
+        id: getCafeId(updatedCafe),
+        quantity: clampedQuantity,
+      };
+    }
+
     return {
       ...item,
       ...updatedCafe,
       id: getCafeId(updatedCafe),
       quantity: item.quantity,
     };
-  });
+  }).filter(Boolean);
 };
 
 export const useCoffeeStore = create(
@@ -42,7 +59,7 @@ export const useCoffeeStore = create(
             cart: syncCartWithCafes(state.cart, cafes),
             loading: false,
           }));
-        } catch (err) {
+        } catch {
           set({ error: 'Error al cargar el catalogo', loading: false });
         }
       },
@@ -51,9 +68,9 @@ export const useCoffeeStore = create(
         try {
           const favorites = await favoriteApi.getFavorites();
           set({ favorites: Array.isArray(favorites) ? favorites.map(String) : [] });
-        } catch (err) {
+        } catch (error) {
           set({ favorites: [] });
-          console.error('Error al cargar favoritos', err);
+          console.error('Error al cargar favoritos', error);
         }
       },
 
@@ -61,9 +78,9 @@ export const useCoffeeStore = create(
         try {
           const updatedFavorites = await favoriteApi.toggle(id);
           set({ favorites: Array.isArray(updatedFavorites) ? updatedFavorites.map(String) : [] });
-        } catch (err) {
-          console.error('Error al actualizar favorito', err);
-          throw err;
+        } catch (error) {
+          console.error('Error al actualizar favorito', error);
+          throw error;
         }
       },
 
@@ -73,9 +90,9 @@ export const useCoffeeStore = create(
           set((state) => ({
             cafes: state.cafes.map((cafe) => getCafeId(cafe) === String(id) ? updatedCafe : cafe)
           }));
-        } catch (err) {
-          console.error('Error al votar', err);
-          throw err;
+        } catch (error) {
+          console.error('Error al votar', error);
+          throw error;
         }
       },
 
@@ -94,9 +111,9 @@ export const useCoffeeStore = create(
           }));
 
           return response;
-        } catch (err) {
-          console.error('Error al anadir resena', err);
-          throw err;
+        } catch (error) {
+          console.error('Error al anadir reseña', error);
+          throw error;
         }
       },
 
@@ -109,8 +126,16 @@ export const useCoffeeStore = create(
         }
 
         const exists = state.cart.find((item) => getCafeId(item) === cafeId);
+        const stock = Number(currentCafe?.stock);
+
+        if (Number.isFinite(stock) && stock <= 0) {
+          return state;
+        }
 
         if (exists) {
+          if (Number.isFinite(stock) && exists.quantity >= stock) {
+            return state;
+          }
           return {
             cart: state.cart.map((item) =>
               getCafeId(item) === cafeId
