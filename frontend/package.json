@@ -41,5 +41,10 @@
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
     "vite": "^8.0.0"
+  },
+  "supportedArchitectures": {
+    "os": ["linux", "win32"],
+    "cpu": ["x64", "arm64"],
+    "libc": ["musl", "glibc"]
   }
 }
