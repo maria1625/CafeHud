@@ -28,7 +28,7 @@ const RegisterForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
           <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
             Nombre completo

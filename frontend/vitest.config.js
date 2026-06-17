@@ -7,10 +7,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test/setup.js',
+    exclude: ['e2e/**', 'node_modules/**', 'dist/**', 'build/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      threshold: {
+      thresholds: {
         lines: 90,
         branches: 90,
         functions: 90,
