@@ -77,8 +77,9 @@ const ReviewModal = ({ cafe, isOpen, onClose }) => {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-brand-medium dark:text-gray-400 uppercase tracking-widest ml-2">Tu experiencia</label>
+              <label htmlFor="review-comment" className="text-[10px] font-black text-brand-medium dark:text-gray-400 uppercase tracking-widest ml-2">Tu experiencia</label>
               <textarea
+                id="review-comment"
                 required
                 value={comment}
                 onChange={(event) => setComment(event.target.value)}

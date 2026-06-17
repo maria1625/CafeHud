@@ -88,12 +88,17 @@ const CoffeeCard = ({ cafe }) => {
         <img
           src={cafeImageUrl}
           alt={cafe.name}
+          width="800"
+          height="800"
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         />
 
         <button
           onClick={handleToggleFavorite}
           disabled={isBlockedByRole}
+          aria-label={isBlockedByRole ? "Disponible solo para clientes" : isFavorite ? "Quitar de favoritos" : "Anadir a favoritos"}
           className={`absolute top-6 right-6 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md transition-all duration-500 z-20 shadow-xl border ${
             isFavorite
               ? "bg-red-500 border-red-400 scale-110"
@@ -135,6 +140,7 @@ const CoffeeCard = ({ cafe }) => {
         <div className="mb-6 flex items-center justify-between">
           <button
             onClick={() => setShowReviews(!showReviews)}
+            aria-label={showReviews ? "Ocultar reseñas" : `Ver reseñas (${cafe.reviews?.length || 0})`}
             className="text-[10px] font-black text-brand-medium dark:text-gray-400 uppercase tracking-widest hover:text-brand-dark dark:hover:text-white transition-colors"
           >
             {showReviews ? "Ocultar reseñas" : `Ver reseñas (${cafe.reviews?.length || 0})`}
@@ -145,6 +151,7 @@ const CoffeeCard = ({ cafe }) => {
               setIsReviewModalOpen(true);
             }}
             disabled={isBlockedByRole}
+            aria-label={isBlockedByRole ? "Disponible solo para clientes" : "Escribir reseña"}
             className="text-[10px] font-black text-brand-medium dark:text-white underline uppercase tracking-widest"
             title={isBlockedByRole ? "Disponible solo para clientes" : "Escribir reseña"}
           >
@@ -185,7 +192,8 @@ const CoffeeCard = ({ cafe }) => {
           <div className="flex items-center gap-2">
             <button
               onClick={handleVote}
-            disabled={voted || isBlockedByRole}
+              disabled={voted || isBlockedByRole}
+              aria-label={voted ? "Voto registrado" : "Votar por este cafe"}
               className={`flex items-center px-3 py-1.5 rounded-lg border shadow-sm transition-all ${
                 voted
                   ? "bg-green-500 border-green-600 scale-95"
@@ -206,6 +214,13 @@ const CoffeeCard = ({ cafe }) => {
           <button
             onClick={handleAddToCart}
             disabled={isUnavailable || isBlockedByRole}
+            aria-label={
+              isBlockedByRole
+                ? "Disponible solo para clientes"
+                : isUnavailable
+                  ? "Producto no disponible"
+                  : "Anadir al carrito"
+            }
             className={`w-12 h-12 !p-0 !rounded-xl shadow-2xl transition-colors duration-200 flex items-center justify-center border border-white/10 ${
               added
                 ? "bg-green-500 scale-110 rotate-12"

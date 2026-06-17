@@ -66,6 +66,10 @@ const CheckoutPage = () => {
                   <img
                     src={item.imageUrl}
                     alt={item.name}
+                    width="80"
+                    height="80"
+                    loading="lazy"
+                    decoding="async"
                     className="h-20 w-20 rounded-2xl object-cover"
                   />
                   <div className="flex-1">

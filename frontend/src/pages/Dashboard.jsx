@@ -102,7 +102,15 @@ const Dashboard = () => {
             <div className="space-y-4">
               {favoriteCafes.map((cafe) => (
                 <div key={cafe._id || cafe.id} className="flex items-center gap-4 rounded-2xl border border-brand-light p-4">
-                  <img src={cafe.imageUrl} alt={cafe.name} className="h-16 w-16 rounded-xl object-cover" />
+                  <img
+                    src={cafe.imageUrl}
+                    alt={cafe.name}
+                    width="64"
+                    height="64"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-16 w-16 rounded-xl object-cover"
+                  />
                   <div className="flex-1">
                     <h3 className="font-black text-brand-dark">{cafe.name}</h3>
                     <p className="text-xs font-bold text-brand-medium">{cafe.brand}</p>
@@ -122,7 +130,15 @@ const Dashboard = () => {
             <div className="space-y-4">
               {cart.map((item) => (
                 <div key={item.id} className="flex items-center gap-4 rounded-2xl border border-brand-light p-4">
-                  <img src={item.imageUrl} alt={item.name} className="h-16 w-16 rounded-xl object-cover" />
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    width="64"
+                    height="64"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-16 w-16 rounded-xl object-cover"
+                  />
                   <div className="flex-1">
                     <h3 className="font-black text-brand-dark">{item.name}</h3>
                     <p className="text-xs font-bold text-brand-medium">{formatCOP(item.price)} x {item.quantity}</p>
@@ -133,15 +149,16 @@ const Dashboard = () => {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <button className="rounded-lg border border-brand-light px-3 py-1 font-black" onClick={() => removeFromCart(item.id)}>-</button>
+                    <button aria-label={`Quitar una unidad de ${item.name}`} className="rounded-lg border border-brand-light px-3 py-1 font-black" onClick={() => removeFromCart(item.id)}>-</button>
                     <button
+                      aria-label={`Agregar una unidad de ${item.name}`}
                       className="rounded-lg border border-brand-light px-3 py-1 font-black disabled:cursor-not-allowed disabled:opacity-50"
                       onClick={() => addToCart(item)}
                       disabled={!item.available}
                     >
                       +
                     </button>
-                    <button className="rounded-lg bg-red-600 px-3 py-1 font-black text-white" onClick={() => clearItemFromCart(item.id)}>Quitar</button>
+                    <button aria-label={`Quitar ${item.name} del carrito`} className="rounded-lg bg-red-600 px-3 py-1 font-black text-white" onClick={() => clearItemFromCart(item.id)}>Quitar</button>
                   </div>
                 </div>
               ))}
@@ -163,7 +180,15 @@ const Dashboard = () => {
                 <article key={review._id} className="rounded-2xl border border-brand-light p-5">
                   <div className="flex items-center gap-4 mb-4">
                     {review.cafe?.imageUrl && (
-                      <img src={review.cafe.imageUrl} alt={review.cafe.name} className="h-14 w-14 rounded-xl object-cover" />
+                      <img
+                        src={review.cafe.imageUrl}
+                        alt={review.cafe.name}
+                        width="56"
+                        height="56"
+                        loading="lazy"
+                        decoding="async"
+                        className="h-14 w-14 rounded-xl object-cover"
+                      />
                     )}
                     <div>
                       <h3 className="font-black text-brand-dark">{review.cafe?.name || "Cafe eliminado"}</h3>

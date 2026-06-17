@@ -82,11 +82,16 @@ const CartSidebar = ({ isOpen, onClose }) => {
                       type="button"
                       className="relative w-28 h-28 rounded-3xl overflow-hidden bg-brand-light/10 flex-shrink-0 border-2 border-brand-light/20 group-hover:border-brand-medium transition-all duration-500 cursor-pointer shadow-lg"
                       onClick={() => setPreviewImage(item.imageUrl)}
+                      aria-label={`Ampliar imagen de ${item.name}`}
                       title="Ampliar imagen"
                     >
                       <img
                         src={item.imageUrl}
                         alt={item.name}
+                        width="112"
+                        height="112"
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
@@ -135,6 +140,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           type="button"
                           onClick={() => clearItemFromCart(item.id)}
                           className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                          aria-label={`Eliminar ${item.name} del carrito`}
                           title="Eliminar producto"
                         >
                           <Trash2 className="w-5 h-5 text-red-500" />
@@ -182,7 +188,14 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   exit={{ scale: 0.98, opacity: 0 }}
                   transition={{ type: "tween", duration: 0.2 }}
                 >
-                  <img src={previewImage} alt="Vista previa" className="w-full h-full object-cover" />
+                  <img
+                    src={previewImage}
+                    alt="Vista previa"
+                    width="1024"
+                    height="1024"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                  />
                   <button
                     type="button"
                     className="absolute top-8 right-8 w-12 h-12 bg-black/50 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-white hover:text-black transition-all"
