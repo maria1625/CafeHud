@@ -41,7 +41,7 @@ const LoginForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div className="space-y-3">
           <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
             Correo electronico
