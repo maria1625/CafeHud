@@ -47,31 +47,6 @@ const AdminDashboard = () => {
         adminApi.getCafes(),
         adminApi.getReviews()
       ]);
-      // #region debug-point C:load-admin-data
-      fetch("http://127.0.0.1:7777/event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: "inventory-not-reflecting",
-          runId: "pre-fix",
-          hypothesisId: "C",
-          location: "AdminDashboard.jsx:loadAdminData",
-          msg: "[DEBUG] admin data loaded from api",
-          data: {
-            cafesCount: Array.isArray(cafesRes) ? cafesRes.length : -1,
-            sample: Array.isArray(cafesRes)
-              ? cafesRes.slice(0, 3).map((cafe) => ({
-                  id: cafe._id,
-                  name: cafe.name,
-                  stock: cafe.stock,
-                  minimumStock: cafe.minimumStock,
-                }))
-              : [],
-          },
-          ts: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
       setUsers(Array.isArray(usersRes) ? usersRes : []);
       setCafes(Array.isArray(cafesRes) ? cafesRes : []);
       setReviews(Array.isArray(reviewsRes) ? reviewsRes : []);
@@ -87,32 +62,6 @@ const AdminDashboard = () => {
       loadAdminData();
     }
   }, [isAdmin]);
-
-  useEffect(() => {
-    // #region debug-point C:inventory-render
-    fetch("http://127.0.0.1:7777/event", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        sessionId: "inventory-not-reflecting",
-        runId: "pre-fix",
-        hypothesisId: "C",
-        location: "AdminDashboard.jsx:load/render",
-        msg: "[DEBUG] cafes state updated in admin dashboard",
-        data: {
-          total: cafes.length,
-          sample: cafes.slice(0, 3).map((cafe) => ({
-            id: cafe._id,
-            name: cafe.name,
-            stock: cafe.stock,
-            minimumStock: cafe.minimumStock,
-          })),
-        },
-        ts: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
-  }, [cafes]);
 
   const buildCafePayload = (cafe) => ({
     ...cafe,
@@ -161,21 +110,6 @@ const AdminDashboard = () => {
     event.preventDefault();
     setAdminError("");
     try {
-      // #region debug-point A:create-payload
-      fetch("http://127.0.0.1:7777/event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: "inventory-not-reflecting",
-          runId: "pre-fix",
-          hypothesisId: "A",
-          location: "AdminDashboard.jsx:handleCreateCafe",
-          msg: "[DEBUG] create cafe payload before api call",
-          data: buildCafePayload(newCafe),
-          ts: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
       await adminApi.createCafe(buildCafePayload(newCafe));
       setNewCafe(emptyCafe);
       await loadAdminData();
@@ -209,21 +143,6 @@ const AdminDashboard = () => {
   const handleSaveCafe = async (cafeId) => {
     setAdminError("");
     try {
-      // #region debug-point A:update-payload
-      fetch("http://127.0.0.1:7777/event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: "inventory-not-reflecting",
-          runId: "pre-fix",
-          hypothesisId: "A",
-          location: "AdminDashboard.jsx:handleSaveCafe",
-          msg: "[DEBUG] update cafe payload before api call",
-          data: { cafeId, payload: buildCafePayload(editingCafeData) },
-          ts: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
       await adminApi.updateCafe(cafeId, buildCafePayload(editingCafeData));
       await loadAdminData();
       setEditingCafeId(null);
@@ -384,6 +303,10 @@ const AdminDashboard = () => {
                           <img
                             src={cafe.imageUrl}
                             alt={cafe.name}
+                            width="640"
+                            height="416"
+                            loading="lazy"
+                            decoding="async"
                             className="h-52 w-full object-cover"
                           />
                           <div className="p-6 space-y-4">
@@ -469,6 +392,7 @@ const AdminDashboard = () => {
                     <select
                       value={user.role}
                       onChange={(event) => handleRoleChange(user._id, event.target.value)}
+                      aria-label={`Cambiar rol de ${user.name}`}
                       className="rounded-lg border border-brand-light bg-brand-beige px-3 py-2 text-sm font-bold text-brand-dark dark:text-white"
                     >
                       <option value="client">Cliente</option>
@@ -499,6 +423,10 @@ const CafeForm = ({ title, cafe, onChange, onSubmit, submitLabel, secondaryActio
           <img
             src={cafe.imageUrl}
             alt={cafe.name || "Vista previa del cafe"}
+            width="896"
+            height="448"
+            loading="lazy"
+            decoding="async"
             className="h-56 w-full rounded-2xl object-cover"
           />
         ) : (
@@ -507,18 +435,18 @@ const CafeForm = ({ title, cafe, onChange, onSubmit, submitLabel, secondaryActio
           </div>
         )}
       </div>
-      <input value={cafe.name} onChange={(event) => onChange("name", event.target.value)} placeholder="Nombre" className="input-premium" required />
-      <input value={cafe.brand} onChange={(event) => onChange("brand", event.target.value)} placeholder="Marca" className="input-premium" required />
-      <input value={cafe.origin} onChange={(event) => onChange("origin", event.target.value)} placeholder="Origen" className="input-premium" required />
-      <select value={cafe.roast} onChange={(event) => onChange("roast", event.target.value)} className="input-premium">
+      <input aria-label="Nombre del cafe" value={cafe.name} onChange={(event) => onChange("name", event.target.value)} placeholder="Nombre" className="input-premium" required />
+      <input aria-label="Marca del cafe" value={cafe.brand} onChange={(event) => onChange("brand", event.target.value)} placeholder="Marca" className="input-premium" required />
+      <input aria-label="Origen del cafe" value={cafe.origin} onChange={(event) => onChange("origin", event.target.value)} placeholder="Origen" className="input-premium" required />
+      <select aria-label="Nivel de tueste" value={cafe.roast} onChange={(event) => onChange("roast", event.target.value)} className="input-premium">
         <option value="Claro">Claro</option>
         <option value="Medio">Medio</option>
         <option value="Oscuro">Oscuro</option>
       </select>
-      <input type="number" value={cafe.price} onChange={(event) => onChange("price", event.target.value)} placeholder="Precio" className="input-premium" min="0" step="0.01" required />
-      <input type="number" value={cafe.stock} onChange={(event) => onChange("stock", event.target.value)} placeholder="Stock" className="input-premium" min="0" step="1" required />
-      <input type="number" value={cafe.minimumStock} onChange={(event) => onChange("minimumStock", event.target.value)} placeholder="Stock mínimo" className="input-premium" min="0" step="1" required />
-      <input value={cafe.imageUrl} onChange={(event) => onChange("imageUrl", event.target.value)} placeholder="URL de imagen o deja vacío para subir archivo" className="input-premium" />
+      <input aria-label="Precio del cafe" type="number" value={cafe.price} onChange={(event) => onChange("price", event.target.value)} placeholder="Precio" className="input-premium" min="0" step="0.01" required />
+      <input aria-label="Stock disponible" type="number" value={cafe.stock} onChange={(event) => onChange("stock", event.target.value)} placeholder="Stock" className="input-premium" min="0" step="1" required />
+      <input aria-label="Stock mínimo" type="number" value={cafe.minimumStock} onChange={(event) => onChange("minimumStock", event.target.value)} placeholder="Stock mínimo" className="input-premium" min="0" step="1" required />
+      <input aria-label="URL de imagen" value={cafe.imageUrl} onChange={(event) => onChange("imageUrl", event.target.value)} placeholder="URL de imagen o deja vacío para subir archivo" className="input-premium" />
       <label className="flex flex-col gap-2 rounded-2xl border border-brand-light bg-brand-bg px-5 py-4 text-sm font-black text-brand-dark">
         <span className="uppercase tracking-[0.2em] text-[10px] font-black text-brand-medium">Imagen desde tu equipo</span>
         <input
@@ -537,7 +465,7 @@ const CafeForm = ({ title, cafe, onChange, onSubmit, submitLabel, secondaryActio
       <div className="rounded-2xl border border-brand-light bg-brand-bg px-5 py-4 text-sm font-black text-brand-dark">
         Disponible para clientes segun el stock registrado
       </div>
-      <textarea value={cafe.description} onChange={(event) => onChange("description", event.target.value)} placeholder="Descripcion" rows="3" className="input-premium lg:col-span-2" required />
+      <textarea aria-label="Descripcion del cafe" value={cafe.description} onChange={(event) => onChange("description", event.target.value)} placeholder="Descripcion" rows="3" className="input-premium lg:col-span-2" required />
       <div className="lg:col-span-2 flex flex-wrap gap-3">
         <button type="submit" className="btn-premium">{submitLabel}</button>
         {secondaryAction && (

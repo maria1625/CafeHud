@@ -22,6 +22,7 @@ const FilterBar = () => {
               type="checkbox" 
               checked={filters.availability || false}
               onChange={(e) => setFilters({ ...filters, availability: e.target.checked })}
+              aria-label="Mostrar solo cafes disponibles"
               className="peer appearance-none w-7 h-7 rounded-xl border-2 border-brand-medium/40 dark:border-white/20 bg-white/70 dark:bg-white/10 checked:bg-brand-medium dark:checked:bg-white checked:border-brand-medium dark:checked:border-white transition-colors cursor-pointer shadow-sm"
             />
             <svg 
@@ -44,6 +45,7 @@ const FilterBar = () => {
               checked={filters.onlyFavorites || false}
               onChange={(e) => setFilters({ ...filters, onlyFavorites: e.target.checked })}
               disabled={!canUseFavorites}
+              aria-label="Mostrar solo mis favoritos"
               className="peer appearance-none w-7 h-7 rounded-xl border-2 border-brand-medium/40 dark:border-white/20 bg-white/70 dark:bg-white/10 checked:bg-red-500 dark:checked:bg-red-500 checked:border-red-500 transition-colors shadow-sm disabled:cursor-not-allowed"
             />
             <svg 
@@ -66,6 +68,7 @@ const FilterBar = () => {
           <select 
             value={filters.sortBy || "name"}
             onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
+            aria-label="Ordenar cafes"
             className="flex-1 lg:flex-none p-3 bg-brand-beige/20 dark:bg-black/40 border-2 border-brand-beige dark:border-white/10 rounded-xl text-brand-dark dark:text-white font-bold focus:ring-4 focus:ring-brand-dark/5 focus:border-brand-dark focus:outline-none cursor-pointer hover:bg-brand-beige/40 transition-all text-sm min-w-[180px]"
           >
             <option value="name">Alfabeto (A-Z)</option>
@@ -78,6 +81,7 @@ const FilterBar = () => {
         {(filters.availability || filters.onlyFavorites || filters.sortBy !== "name") && (
           <button 
             onClick={clearFilters}
+            aria-label="Limpiar filtros"
             className="flex items-center gap-2 px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
