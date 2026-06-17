@@ -43,10 +43,11 @@ const LoginForm = () => {
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div className="space-y-3">
-          <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
+          <label htmlFor="login-email" className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
             Correo electronico
           </label>
           <input
+            id="login-email"
             type="email"
             placeholder="tu@email.com"
             {...register("email")}
@@ -60,10 +61,11 @@ const LoginForm = () => {
         </div>
 
         <div className="space-y-3">
-          <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
+          <label htmlFor="login-password" className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
             Contrasena
           </label>
           <input
+            id="login-password"
             type="password"
             placeholder="********"
             {...register("password")}

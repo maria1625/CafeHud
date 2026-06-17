@@ -30,10 +30,11 @@ const RegisterForm = () => {
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
-          <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
+          <label htmlFor="register-name" className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
             Nombre completo
           </label>
           <input
+            id="register-name"
             placeholder="Juan Perez"
             {...register("name", { required: "El nombre es obligatorio" })}
             className={`input-premium ${errors.name ? "border-red-300 ring-4 ring-red-50" : ""}`}
@@ -42,10 +43,11 @@ const RegisterForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
+          <label htmlFor="register-email" className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
             Correo electronico
           </label>
           <input
+            id="register-email"
             placeholder="tu@email.com"
             {...register("email", {
               required: "El correo es obligatorio",
@@ -60,10 +62,11 @@ const RegisterForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
+          <label htmlFor="register-password" className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
             Contrasena
           </label>
           <input
+            id="register-password"
             type="password"
             placeholder="********"
             {...register("password", {
@@ -76,10 +79,11 @@ const RegisterForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
+          <label htmlFor="register-confirm-password" className="block text-[10px] font-black text-brand-dark uppercase tracking-[0.3em] ml-1">
             Confirmar contrasena
           </label>
           <input
+            id="register-confirm-password"
             type="password"
             placeholder="********"
             {...register("confirmPassword", {
